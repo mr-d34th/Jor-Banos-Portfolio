@@ -1,0 +1,176 @@
+{
+  "nav": {
+    "home": "Home",
+    "experience": "Experience",
+    "stack": "Stack",
+    "about": "About",
+    "contact": "Contact",
+    "whatsapp": "WhatsApp"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "role_prefix": "Semi-Senior",
+    "role": "Frontend Developer",
+    "description": "Front-End Programmer Analyst with experience in Angular, React and Java. Committed to clean code, punctuality and development best practices.",
+    "cta_projects": "View credentials & PDF",
+    "cta_talk": "Let's talk",
+    "stat_years": "Yrs exp.",
+    "stat_projects": "Projects",
+    "stat_users": "Companies",
+    "scroll": "scroll"
+  },
+  "experience": {
+    "tag": "03 / Journey",
+    "title": "Experience",
+    "metric_years_number": "4+",
+    "metric_years_label": "Years of experience",
+    "metric_years_desc": "Since Aug 2021 in banking, consulting and e-commerce",
+    "metric_projects_number": "3",
+    "metric_projects_label": "Banking migrations",
+    "metric_projects_desc": "Legacy platforms to React for Scotiabank",
+    "metric_users_number": "80%",
+    "metric_users_label": "Error reduction",
+    "metric_users_desc": "In production with React Hook Form at Scotiabank",
+    "metric_tests_number": "50%",
+    "metric_tests_label": "Performance boost",
+    "metric_tests_desc": "On MC Asesoría's WordPress platform",
+    "sectors_label": "Industries I've worked in",
+    "sectors": [
+      "Banking",
+      "IT Consulting",
+      "E-commerce",
+      "Government",
+      "WordPress / CMS",
+      "DevOps"
+    ],
+    "quote": "Committed to clean code and best practices. Open to new challenges that allow me to innovate and explore new technological frontiers.",
+    "aside_badge": "Available for projects",
+    "aside_title": "My full journey",
+    "aside_text": "Over 4 years building digital products in banking (Scotiabank), consulting (MC Asesoría) and e-commerce. Each stage with measurable results and modern technologies.",
+    "aside_btn": "Timeline",
+    "aside_cv_label": "Resume",
+    "aside_cv_btn": "Download PDF ↓",
+    "aside_stat_years": "years in industry",
+    "aside_stat_companies": "companies",
+    "aside_stat_projects": "projects"
+  },
+  "stack": {
+    "tag": "04 / Technologies",
+    "title": "Stack",
+    "subtitle": "The tools I work with every day to build scalable, high-quality products.",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "data": "Databases",
+    "devops": "DevOps & Cloud",
+    "design": "Design & Tools",
+    "workflow": "Workflow"
+  },
+  "about": {
+    "tag": "05 / About",
+    "title_line1": "A little",
+    "title_line2": "about me",
+    "lead": "I'm Jorge Baños, a Front-End Semi-Senior Programmer Analyst based in Lima, Peru. I specialize in Angular and React, with additional backend experience in Java and Python.",
+    "body1": "I've worked on banking projects for Scotiabank (platform migrations to React), CRM system development with Angular + Java, and WordPress/Magento platform maintenance. I excel at JSON design and manipulation, REST API integration, and agile methodologies.",
+    "body2": "Outside of code, I'm interested in UI/UX design with Figma, clean software architecture, and continuing to grow as a Systems Engineer at UPN. Open to new challenges that allow me to innovate.",
+    "cta_talk": "Let's talk",
+    "cta_cv": "Download CV"
+  },
+  "contact": {
+    "tag": "06 / Contact",
+    "title_line1": "Got a project",
+    "title_line2": "in mind?",
+    "subtitle": "I'm available for freelance projects and full-time opportunities. Let's talk and see how I can help you.",
+    "wa_label": "WhatsApp",
+    "wa_value": "+51 997 025 331",
+    "email_label": "Email",
+    "email_value": "jorge99bc@gmail.com",
+    "form_name": "Name",
+    "form_name_placeholder": "Your full name",
+    "form_email": "Email",
+    "form_email_placeholder": "your@email.com",
+    "form_message": "Message",
+    "form_message_placeholder": "Tell me about your project...",
+    "form_submit": "Send message"
+  },
+  "footer": {
+    "copy": "Designed and developed with Angular",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "Email"
+  },
+  "lang": {
+    "switch": "ES"
+  },
+  "timeline": {
+    "system_label": "// ANIMUS MEMORY CORRIDOR — ACTIVE SEQUENCE",
+    "heading": "Synchronization",
+    "heading_accent": "Complete",
+    "btn_back": "◂ PORTFOLIO",
+    "btn_close": "✕ CLOSE",
+    "btn_unmute": "UNMUTE",
+    "btn_mute": "MUTE",
+    "section_dna": "// DNA MILESTONES",
+    "section_skills": "// SKILL MODULES",
+    "mem_tag_prefix": "// MEMORY SYNC ·",
+    "system_origin": "SYSTEM_ORIGIN",
+    "mem_0_role": "Fullstack Developer / DevOps",
+    "mem_0_origin": "MC Asesoría & Gestión E.I.R.L.",
+    "mem_0_year": "FEB 2026 — PRESENT",
+    "mem_0_dna_0": "CRM sales system: Angular frontend + Java Spring Boot backend",
+    "mem_0_dna_1": "DevOps on SIFA-OEFA project under Cisco infrastructure",
+    "mem_0_dna_2": "40% reduction in incident response time",
+    "mem_0_dna_3": "50% performance improvement on WordPress platform",
+    "mem_1_role": "Front-End Programmer Analyst",
+    "mem_1_origin": "SES — Scotiabank Project",
+    "mem_1_year": "AUG 2021 — FEB 2025",
+    "mem_1_dna_0": "3 banking platform migrations from legacy to React",
+    "mem_1_dna_1": "80% reduction in production errors with React Hook Form",
+    "mem_1_dna_2": "Banking API integration with Axios under SCRUM standards",
+    "mem_1_dna_3": "Scalable navigation flows with React Router",
+    "mem_2_role": "IT Programmer",
+    "mem_2_origin": "Cosas Peruanas S.R.L.",
+    "mem_2_year": "JUL 2025 — AUG 2025",
+    "mem_2_dna_0": "Page development with Magento, HTML and Elementor",
+    "mem_2_dna_1": "WordPress Core maintenance and optimization",
+    "mem_2_dna_2": "Operational QA and component deployment to production",
+    "mem_2_dna_3": "Environment governance and plugin/theme updates",
+    "mem_3_role": "Student & Technical Training",
+    "mem_3_origin": "CIBERTEC / UPN / Certifications",
+    "mem_3_year": "2020 — 2021",
+    "mem_3_dna_0": "Computing and IT — I.E. CIBERTEC 2020",
+    "mem_3_dna_1": "Web Design and Development — I.E. IDAT 2022",
+    "mem_3_dna_2": "Systems Engineering started — UPN 2023",
+    "mem_3_dna_3": "First projects with Angular, React and REST APIs"
+  },
+  "certificates": {
+    "modal_title": "Credentials & Certificates",
+    "modal_subtitle": "Continuous learning and professional certifications",
+    "search_placeholder": "Search certificate...",
+    "filter_all": "All",
+    "filter_frontend": "Frontend",
+    "filter_backend": "Backend",
+    "filter_cloud": "Cloud",
+    "filter_agile": "Agile",
+    "btn_view_pdf": "View PDF",
+    "btn_close": "Close",
+    "no_results": "No certificates found"
+  },
+  "projects": {
+    "crm": {
+      "title": "CRM Sales System",
+      "description": "Full CRM system with Angular frontend and Java Spring Boot backend. Commercial automation, GitLab version control, and deployment in corporate environments."
+    },
+    "scotiabank": {
+      "title": "Banking Migration — Scotiabank",
+      "description": "Migration of 3 legacy banking web platforms to React. 80% reduction in production errors with React Hook Form, API integration with Axios under SCRUM standards."
+    },
+    "sifa": {
+      "title": "SIFA-OEFA Government Project",
+      "description": "DevOps role on government project under Cisco infrastructure. GitLab merge approvals, Oracle architecture bug fixes, and 40% improvement in incident response time."
+    },
+    "wordpress": {
+      "title": "Corporate Web Platform",
+      "description": "Development and optimization of WordPress + Magento platform. 50% performance improvement through Core maintenance, plugins, and themes. Pages built with Elementor and HTML."
+    }
+  }
+}
