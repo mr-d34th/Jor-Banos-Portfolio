@@ -44,7 +44,7 @@ export class TranslationService {
 
     try {
       const data = await firstValueFrom(
-        this.http.get<Record<string, any>>(`/assets/i18n/${lang}.json`),
+        this.http.get<Record<string, any>>(`./assets/i18n/${lang}.json`),
       );
 
       this.translations.set(data);
