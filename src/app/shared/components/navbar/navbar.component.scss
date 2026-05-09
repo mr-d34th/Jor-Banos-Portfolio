@@ -1,0 +1,359 @@
+// ─── Variables ────────────────────────────────────────────────────────────────
+:host {
+  --nav-height: 72px;
+  --nav-bg: rgba(8, 8, 12, 0.82);
+  --nav-bg-scrolled: rgba(8, 8, 12, 0.92);
+  --nav-accent: #c9a84c;
+  --nav-text: #e8e6e0;
+  --nav-muted: rgba(232, 230, 224, 0.5);
+  --nav-border: rgba(201, 168, 76, 0.2);
+  --nav-blur: blur(16px);
+  --font-display: 'Georgia', 'Times New Roman', serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+// ─── Float animation (the "nodo" effect) ──────────────────────────────────────
+@keyframes float-link {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ─── Header base ──────────────────────────────────────────────────────────────
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+  backdrop-filter: var(--nav-blur);
+  -webkit-backdrop-filter: var(--nav-blur);
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease;
+
+  &.scrolled {
+    background: var(--nav-bg-scrolled);
+    border-bottom-color: rgba(201, 168, 76, 0.35);
+  }
+}
+
+.navbar__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+// ─── Logo ─────────────────────────────────────────────────────────────────────
+.navbar__logo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: var(--nav-text);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  .logo__bracket {
+    color: var(--nav-accent);
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  .logo__name {
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .logo__dot {
+    color: var(--nav-accent);
+    font-size: 1.8rem;
+  }
+}
+
+// ─── Desktop nav links ────────────────────────────────────────────────────────
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  color: var(--nav-muted);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  position: relative;
+  transition: color 0.25s ease;
+
+  // The floating "nodo" effect — each link floats at different phase
+  animation: float-link 3s ease-in-out infinite;
+
+  &:hover {
+    color: var(--nav-text);
+
+    .nav-link__dot {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // Accent underline on hover
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 80%;
+    height: 1px;
+    background: var(--nav-accent);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:hover::after {
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+.nav-link__text {
+  display: block;
+}
+
+.nav-link__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--nav-accent);
+  opacity: 0;
+  transform: scale(0);
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// ─── CTA WhatsApp ─────────────────────────────────────────────────────────────
+.navbar__cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--nav-border);
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 8px 16px;
+  color: var(--nav-accent);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--nav-accent);
+    color: #080808;
+    border-color: var(--nav-accent);
+  }
+}
+
+// ─── Hamburger (mobile) ───────────────────────────────────────────────────────
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: auto;
+
+  span {
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: var(--nav-text);
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    transform-origin: center;
+  }
+
+  &.open {
+    span:nth-child(1) {
+      transform: rotate(45deg) translate(4.5px, 4.5px);
+    }
+    span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    span:nth-child(3) {
+      transform: rotate(-45deg) translate(4.5px, -4.5px);
+    }
+  }
+}
+
+// ─── Mobile menu ─────────────────────────────────────────────────────────────
+.navbar__mobile {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(8, 8, 12, 0.97);
+  border-top: 1px solid var(--nav-border);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.open {
+    max-height: 480px;
+  }
+}
+
+.mobile-link {
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  padding: 1rem 2rem;
+  color: var(--nav-muted);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  width: 100%;
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+
+  &:hover {
+    color: var(--nav-text);
+    padding-left: 2.5rem;
+  }
+}
+
+.mobile-lang {
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+  background: none;
+  border: none;
+  border-top: 1px solid var(--nav-border);
+  cursor: pointer;
+  padding: 1rem 2rem;
+  color: var(--nav-accent);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  width: 100%;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .navbar__links {
+    display: none;
+  }
+  .navbar__cta {
+    display: none;
+  }
+  .navbar__hamburger {
+    display: flex;
+  }
+  .navbar__mobile {
+    display: flex;
+  }
+}
+
+// ─── Mobile CTA WhatsApp (arreglado) ──────────────────────────────────────────
+.mobile-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(201, 168, 76, 0.08);
+  border: none;
+  border-top: 1px solid var(--nav-border);
+  cursor: pointer;
+  padding: 1.125rem 2rem;
+  color: var(--nav-accent);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+
+  &::before {
+    content: '●';
+    font-size: 0.5rem;
+    opacity: 0.7;
+  }
+
+  &:hover {
+    background: rgba(201, 168, 76, 0.15);
+    color: #fff;
+  }
+}

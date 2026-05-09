@@ -1,0 +1,169 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "experience": "Experiencia",
+    "stack": "Stack",
+    "about": "Sobre mí",
+    "contact": "Contacto",
+    "whatsapp": "WhatsApp"
+  },
+  "hero": {
+    "greeting": "Hola, soy",
+    "role_prefix": "Semi-Senior",
+    "role": "Frontend Developer",
+    "description": "Analista Programador Front-End con experiencia en Angular, React y Java. Comprometido con el código limpio, la puntualidad y las mejores prácticas de desarrollo.",
+    "cta_projects": "Ver credenciales y PDF",
+    "cta_talk": "Hablemos",
+    "stat_years": "Años exp.",
+    "stat_projects": "Proyectos",
+    "stat_users": "Empresas",
+    "scroll": "scroll"
+  },
+  "experience": {
+    "tag": "03 / Trayectoria",
+    "title": "Experiencia",
+    "metric_years_number": "4+",
+    "metric_years_label": "Años de experiencia",
+    "metric_years_desc": "Desde ago 2021 en banca, consultoría y e-commerce",
+    "metric_projects_number": "3",
+    "metric_projects_label": "Migraciones bancarias",
+    "metric_projects_desc": "Plataformas legacy a React para Scotiabank",
+    "metric_users_number": "80%",
+    "metric_users_label": "Reducción de errores",
+    "metric_users_desc": "En producción con React Hook Form en Scotiabank",
+    "metric_tests_number": "50%",
+    "metric_tests_label": "Mejora de rendimiento",
+    "metric_tests_desc": "En plataforma WordPress de MC Asesoría",
+    "sectors_label": "Sectores en los que trabajé",
+    "sectors": ["Banca", "Consultoría TI", "E-commerce", "Gobierno", "WordPress / CMS", "DevOps"],
+    "quote": "Comprometido con el código limpio y las mejores prácticas. Dispuesto a nuevos retos que permitan innovar y explorar nuevas fronteras tecnológicas.",
+    "aside_badge": "Disponible para proyectos",
+    "aside_title": "Mi trayectoria completa",
+    "aside_text": "Más de 4 años construyendo productos digitales en banca (Scotiabank), consultoría (MC Asesoría) y e-commerce. Cada etapa con resultados medibles y tecnologías modernas.",
+    "aside_btn": "Línea de tiempo",
+    "aside_cv_label": "Currículum",
+    "aside_cv_btn": "Descargar PDF ↓",
+    "aside_stat_years": "años en la industria",
+    "aside_stat_companies": "empresas",
+    "aside_stat_projects": "proyectos"
+  },
+  "stack": {
+    "tag": "04 / Tecnologías",
+    "title": "Stack",
+    "subtitle": "Las herramientas con las que trabajo día a día para construir productos escalables y de alta calidad.",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "data": "Bases de datos",
+    "devops": "DevOps & Cloud",
+    "design": "Diseño & Herramientas",
+    "workflow": "Workflow"
+  },
+  "about": {
+    "tag": "05 / Sobre mí",
+    "title_line1": "Un poco",
+    "title_line2": "sobre mí",
+    "lead": "Soy Jorge Baños, Analista Programador Front-End Semi-Senior con sede en Lima, Perú. Me especializo en Angular y React, con experiencia adicional en backend con Java y Python.",
+    "body1": "He trabajado en proyectos bancarios para Scotiabank (migración de plataformas a React), desarrollo de sistemas CRM con Angular + Java, y mantenimiento de plataformas WordPress/Magento. Me destaco en el diseño y manipulación de JSON, integración de APIs REST y metodologías ágiles.",
+    "body2": "Fuera del código, me interesa el diseño UI/UX con Figma, la arquitectura de software limpia y seguir creciendo como Ingeniero de Sistemas en la UPN. Abierto a nuevos retos que me permitan innovar.",
+    "cta_talk": "Conversemos",
+    "cta_cv": "Descargar CV"
+  },
+  "contact": {
+    "tag": "06 / Contacto",
+    "title_line1": "¿Tienes un proyecto",
+    "title_line2": "en mente?",
+    "subtitle": "Estoy disponible para proyectos freelance y oportunidades de tiempo completo. Hablemos y veamos cómo puedo ayudarte.",
+    "wa_label": "WhatsApp",
+    "wa_value": "+51 997 025 331",
+    "email_label": "Email",
+    "email_value": "jorge99bc@gmail.com",
+    "form_name": "Nombre",
+    "form_name_placeholder": "Tu nombre completo",
+    "form_email": "Email",
+    "form_email_placeholder": "tu@email.com",
+    "form_message": "Mensaje",
+    "form_message_placeholder": "Cuéntame sobre tu proyecto...",
+    "form_submit": "Enviar mensaje"
+  },
+  "footer": {
+    "copy": "Diseñado y desarrollado con Angular",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "Email"
+  },
+  "lang": {
+    "switch": "EN"
+  },
+  "timeline": {
+    "system_label": "// ANIMUS MEMORY CORRIDOR — SECUENCIA ACTIVA",
+    "heading": "Sincronización",
+    "heading_accent": "Completa",
+    "btn_back": "◂ PORTFOLIO",
+    "btn_close": "✕ CERRAR",
+    "btn_unmute": "UNMUTE",
+    "btn_mute": "MUTE",
+    "section_dna": "// HITOS DE ADN",
+    "section_skills": "// MÓDULOS DE HABILIDAD",
+    "mem_tag_prefix": "// SINCRONIZACIÓN DE MEMORIA ·",
+    "system_origin": "SYSTEM_ORIGIN",
+    "mem_0_role": "Desarrollador Fullstack / DevOps",
+    "mem_0_origin": "MC Asesoría & Gestión E.I.R.L.",
+    "mem_0_year": "FEB 2026 — PRESENTE",
+    "mem_0_dna_0": "CRM de ventas: Angular frontend + Java Spring Boot backend",
+    "mem_0_dna_1": "DevOps en proyecto SIFA-OEFA bajo infraestructura Cisco",
+    "mem_0_dna_2": "Reducción del 40% en tiempo de respuesta a incidencias",
+    "mem_0_dna_3": "Mejora del 50% en rendimiento de plataforma WordPress",
+    "mem_1_role": "Analista Programador Front-End",
+    "mem_1_origin": "SES — Proyecto Scotiabank",
+    "mem_1_year": "AGO 2021 — FEB 2025",
+    "mem_1_dna_0": "3 migraciones de plataformas bancarias legacy a React",
+    "mem_1_dna_1": "Reducción del 80% de errores en producción con React Hook Form",
+    "mem_1_dna_2": "Integración de APIs bancarias con Axios bajo estándares SCRUM",
+    "mem_1_dna_3": "Flujos de navegación escalables con React Router",
+    "mem_2_role": "Programador Informático",
+    "mem_2_origin": "Cosas Peruanas S.R.L.",
+    "mem_2_year": "JUL 2025 — AGO 2025",
+    "mem_2_dna_0": "Desarrollo de páginas en Magento, HTML y Elementor",
+    "mem_2_dna_1": "Mantenimiento y optimización de Core WordPress",
+    "mem_2_dna_2": "QA operativa y despliegue de componentes en producción",
+    "mem_2_dna_3": "Gobierno de ambientes y actualización de plugins y temas",
+    "mem_3_role": "Estudiante & Formación Técnica",
+    "mem_3_origin": "CIBERTEC / UPN / Certificaciones",
+    "mem_3_year": "2020 — 2021",
+    "mem_3_dna_0": "Computación e Informática — I.E. CIBERTEC 2020",
+    "mem_3_dna_1": "Diseño y Desarrollo Web — I.E. IDAT 2022",
+    "mem_3_dna_2": "Inicio de Ingeniería de Sistemas — UPN 2023",
+    "mem_3_dna_3": "Primeros proyectos con Angular, React y APIs REST"
+  },
+  "certificates": {
+    "modal_title": "Credenciales & Certificados",
+    "modal_subtitle": "Formación continua y certificaciones profesionales",
+    "search_placeholder": "Buscar certificado...",
+    "filter_all": "Todos",
+    "filter_frontend": "Frontend",
+    "filter_backend": "Backend",
+    "filter_cloud": "Cloud",
+    "filter_agile": "Agile",
+    "btn_view_pdf": "Ver PDF",
+    "btn_close": "Cerrar",
+    "no_results": "No se encontraron certificados"
+  },
+  "projects": {
+    "crm": {
+      "title": "Sistema CRM de Ventas",
+      "description": "Sistema CRM completo con Angular en el frontend y Java Spring Boot en el backend. Automatización comercial, gestión de versiones en GitLab y despliegue en entornos corporativos."
+    },
+    "scotiabank": {
+      "title": "Migración Bancaria — Scotiabank",
+      "description": "Migración de 3 plataformas web bancarias legacy a React. Reducción del 80% de errores en producción con React Hook Form, integración de APIs con Axios bajo estándares SCRUM."
+    },
+    "sifa": {
+      "title": "Proyecto SIFA-OEFA",
+      "description": "Rol DevOps en proyecto gubernamental bajo infraestructura Cisco. Aprobación de merges GitLab, corrección de bugs en arquitecturas Oracle y mejora del 40% en respuesta a incidencias."
+    },
+    "wordpress": {
+      "title": "Plataforma Web Corporativa",
+      "description": "Desarrollo y optimización de plataforma WordPress + Magento. Mejora del 50% en rendimiento mediante mantenimiento del Core, plugins y temas. Páginas con Elementor y HTML."
+    }
+  }
+}

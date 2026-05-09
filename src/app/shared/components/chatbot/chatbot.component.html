@@ -1,0 +1,164 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     CHATBOT TRIGGER BUTTON (bottom-left, "alive" avatar)
+════════════════════════════════════════════════════════════════ -->
+<div class="cb-trigger-wrap" [class.cb-trigger-wrap--open]="isOpen()">
+  <!-- Outer pulse rings (alive effect) -->
+  <div class="cb-pulse-ring cb-pulse-ring--1" [class.active]="pulseActive()"></div>
+  <div class="cb-pulse-ring cb-pulse-ring--2" [class.active]="pulseActive()"></div>
+
+  <!-- The avatar button -->
+  <button
+    class="cb-trigger"
+    [class.cb-trigger--open]="isOpen()"
+    (click)="toggleOpen()"
+    [attr.aria-label]="isES ? 'Abrir asistente virtual' : 'Open virtual assistant'"
+  >
+    @if (!isOpen()) {
+      <!-- Avatar face — "alive" with blinking eyes -->
+      <div class="cb-avatar" [class.cb-avatar--pulse]="pulseActive()">
+        <div class="cb-avatar__face">
+          <div class="cb-avatar__eyes">
+            <div class="cb-eye" [class.cb-eye--blink]="eyesBlink()">
+              <div class="cb-eye__pupil"></div>
+            </div>
+            <div class="cb-eye" [class.cb-eye--blink]="eyesBlink()">
+              <div class="cb-eye__pupil"></div>
+            </div>
+          </div>
+          <div class="cb-avatar__mouth"><span></span><span></span><span></span></div>
+        </div>
+        <div class="cb-avatar__scan"></div>
+        <div class="cb-avatar__corner cb-avatar__corner--tl"></div>
+        <div class="cb-avatar__corner cb-avatar__corner--tr"></div>
+        <div class="cb-avatar__corner cb-avatar__corner--bl"></div>
+        <div class="cb-avatar__corner cb-avatar__corner--br"></div>
+      </div>
+      <!-- Label tooltip — reactive to language -->
+      <div class="cb-label">
+        <span>{{ tooltipLabel }}</span>
+        <div class="cb-label__dot"></div>
+      </div>
+    } @else {
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    }
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAT PANEL
+════════════════════════════════════════════════════════════════ -->
+@if (isOpen()) {
+  <div class="cb-panel" role="dialog" [attr.aria-label]="panelTitle">
+    <!-- Header -->
+    <div class="cb-panel__header">
+      <div class="cb-panel__avatar-mini">
+        <div class="cb-mini-eye" [class.blink]="eyesBlink()"></div>
+        <div class="cb-mini-eye" [class.blink]="eyesBlink()"></div>
+      </div>
+      <div class="cb-panel__info">
+        <span class="cb-panel__name">{{ panelTitle }}</span>
+        <span class="cb-panel__status">
+          <span class="cb-status-dot"></span>
+          {{ panelStatusLabel }}
+        </span>
+      </div>
+      <button
+        class="cb-panel__close"
+        (click)="close()"
+        [attr.aria-label]="isES ? 'Cerrar' : 'Close'"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="cb-messages">
+      @for (msg of messages(); track msg.timestamp) {
+        <div
+          class="cb-msg"
+          [class.cb-msg--user]="msg.role === 'user'"
+          [class.cb-msg--bot]="msg.role === 'assistant'"
+        >
+          @if (msg.role === 'assistant') {
+            <div class="cb-msg__avatar-dot"></div>
+          }
+          <div class="cb-msg__bubble">
+            <div class="cb-msg__text" [innerHTML]="renderMarkdown(msg.content)"></div>
+            <span class="cb-msg__time">{{ formatTime(msg.timestamp) }}</span>
+          </div>
+        </div>
+      }
+
+      @if (isLoading()) {
+        <div class="cb-msg cb-msg--bot">
+          <div class="cb-msg__avatar-dot"></div>
+          <div class="cb-msg__bubble cb-msg__bubble--typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+
+      <div #messagesEnd></div>
+    </div>
+
+    <!-- Quick questions — reactive to language, hide after first user msg -->
+    @if (!hasUserSentMessage()) {
+      <div class="cb-quick">
+        @for (q of quickQuestions; track q) {
+          <button class="cb-quick__btn" (click)="sendQuick(q)">{{ q }}</button>
+        }
+      </div>
+    }
+
+    <!-- Input -->
+    <div class="cb-input-bar">
+      <input
+        #inputRef
+        type="text"
+        class="cb-input"
+        [placeholder]="inputPlaceholder"
+        [value]="inputText()"
+        (input)="inputText.set($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+        [disabled]="isLoading()"
+        maxlength="300"
+      />
+      <button
+        class="cb-send"
+        (click)="send()"
+        [disabled]="!inputText().trim() || isLoading()"
+        [attr.aria-label]="isES ? 'Enviar' : 'Send'"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+}

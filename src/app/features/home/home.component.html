@@ -1,0 +1,426 @@
+<canvas #smokeCanvas class="smoke-canvas" aria-hidden="true"></canvas>
+<!-- ═══════════════════════════════════════════════════
+     HERO — #home
+════════════════════════════════════════════════════ -->
+<section id="home" class="hero">
+  <div class="hero__bg-grid"></div>
+  <div class="hero__bg-scan"></div>
+
+  <!-- Celdas parpadeantes -->
+  <div class="hero__bg-cells">
+    <div class="cell" style="top: 10%; left: 8%; --dur: 2.8s; --delay: 0s"></div>
+    <div class="cell" style="top: 25%; left: 35%; --dur: 4s; --delay: 0.6s"></div>
+    <div class="cell" style="top: 60%; left: 15%; --dur: 3.2s; --delay: 1.2s"></div>
+    <div class="cell" style="top: 70%; left: 55%; --dur: 5s; --delay: 0.3s"></div>
+    <div class="cell" style="top: 40%; left: 70%; --dur: 3.6s; --delay: 1.8s"></div>
+    <div class="cell" style="top: 15%; left: 80%; --dur: 4.4s; --delay: 0.9s"></div>
+    <div class="cell" style="top: 85%; left: 80%; --dur: 2.5s; --delay: 2.1s"></div>
+    <div class="cell" style="top: 50%; left: 90%; --dur: 3.8s; --delay: 0.4s"></div>
+  </div>
+
+  <!-- Partículas flotantes -->
+  <div class="hero__bg-particles">
+    <div class="pt pt--tri" style="bottom: 20%; left: 12%; --s: 10px; --dur: 5s; --delay: 0s"></div>
+    <div class="pt pt--sq" style="bottom: 35%; left: 28%; --s: 8px; --dur: 4s; --delay: 1s"></div>
+    <div
+      class="pt pt--tri"
+      style="bottom: 15%; left: 55%; --s: 12px; --dur: 6s; --delay: 0.5s"
+    ></div>
+    <div class="pt pt--sq" style="bottom: 40%; left: 72%; --s: 6px; --dur: 3.5s; --delay: 2s"></div>
+    <div
+      class="pt pt--tri"
+      style="bottom: 25%; left: 88%; --s: 9px; --dur: 4.5s; --delay: 1.5s"
+    ></div>
+    <div
+      class="pt pt--sq"
+      style="bottom: 10%; left: 42%; --s: 7px; --dur: 5.5s; --delay: 0.8s"
+    ></div>
+    <div
+      class="pt pt--tri"
+      style="bottom: 50%; left: 6%; --s: 11px; --dur: 4.2s; --delay: 2.4s"
+    ></div>
+    <div
+      class="pt pt--sq"
+      style="bottom: 60%; left: 95%; --s: 8px; --dur: 3.8s; --delay: 1.2s"
+    ></div>
+  </div>
+
+  <!-- HUD corners -->
+  <div class="hero__bg-hud" aria-hidden="true">
+    <div class="hud-c hud-c--tl"></div>
+    <div class="hud-c hud-c--tr"></div>
+    <div class="hud-c hud-c--bl"></div>
+    <div class="hud-c hud-c--br"></div>
+  </div>
+  <div class="hero__content">
+    <p class="hero__eyebrow">{{ 'hero.greeting' | translate }}</p>
+    <h1 class="hero__name">Jorge<span class="hero__accent">.</span></h1>
+    <h2 class="hero__role">
+      <span class="hero__role-prefix">{{ 'hero.role_prefix' | translate }}</span>
+      {{ 'hero.role' | translate }}
+    </h2>
+    <p class="hero__description">
+      {{ 'hero.description' | translate }}
+    </p>
+    <div class="hero__actions">
+      <button class="btn btn--primary btn--cert" (click)="openCertificates()">
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="9" y1="13" x2="15" y2="13" />
+          <line x1="9" y1="17" x2="15" y2="17" />
+        </svg>
+        {{ 'hero.cta_projects' | translate }}
+      </button>
+      <button class="btn btn--ghost" (click)="scrollTo('contact')">
+        {{ 'hero.cta_talk' | translate }}
+      </button>
+    </div>
+    <div class="hero__stats">
+      <div class="stat">
+        <span class="stat__number">4+</span>
+        <span class="stat__label">{{ 'hero.stat_years' | translate }}</span>
+      </div>
+      <div class="stat__divider"></div>
+      <div class="stat">
+        <span class="stat__number">8+</span>
+        <span class="stat__label">{{ 'hero.stat_projects' | translate }}</span>
+      </div>
+      <div class="stat__divider"></div>
+      <div class="stat">
+        <span class="stat__number">3</span>
+        <span class="stat__label">{{ 'hero.stat_users' | translate }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero__scroll-hint">
+    <span>{{ 'hero.scroll' | translate }}</span>
+    <div class="hero__scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     EXPERIENCIA — #experience
+════════════════════════════════════════════════════ -->
+<section id="experience" class="section section--dark">
+  <div class="container">
+    <header class="section__header">
+      <span class="section__tag">03 / Trayectoria</span>
+      <h2 class="section__title">Experiencia<span class="accent">.</span></h2>
+    </header>
+
+    <div class="experience-layout">
+      <!-- Métricas + highlights -->
+      <div class="exp-highlights">
+        <div class="exp-metric-grid">
+          <div class="exp-metric">
+            <span class="exp-metric__number">4+</span>
+            <span class="exp-metric__label">{{ 'experience.metric_years_label' | translate }}</span>
+            <span class="exp-metric__desc">{{ 'experience.metric_years_desc' | translate }}</span>
+          </div>
+          <div class="exp-metric">
+            <span class="exp-metric__number">3</span>
+            <span class="exp-metric__label">{{
+              'experience.metric_projects_label' | translate
+            }}</span>
+            <span class="exp-metric__desc">{{
+              'experience.metric_projects_desc' | translate
+            }}</span>
+          </div>
+          <div class="exp-metric">
+            <span class="exp-metric__number">80%</span>
+            <span class="exp-metric__label">{{ 'experience.metric_users_label' | translate }}</span>
+            <span class="exp-metric__desc">{{ 'experience.metric_users_desc' | translate }}</span>
+          </div>
+          <div class="exp-metric">
+            <span class="exp-metric__number">50%</span>
+            <span class="exp-metric__label">{{ 'experience.metric_tests_label' | translate }}</span>
+            <span class="exp-metric__desc">{{ 'experience.metric_tests_desc' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="exp-chips-section">
+          <p class="exp-chips-label">{{ 'experience.sectors_label' | translate }}</p>
+          <div class="exp-chips">
+            @for (
+              sector of [
+                'Fintech',
+                'E-commerce',
+                'SaaS B2B',
+                'Agencias digitales',
+                'Startups',
+                'Banca',
+              ];
+              track sector
+            ) {
+              <span class="exp-chip">{{ sector }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="exp-quote">
+          <span class="exp-quote__mark">"</span>
+          <p>
+            {{ 'experience.quote' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel lateral con CTA -->
+      <aside class="experience-aside">
+        <div class="aside-card">
+          <!-- Badge disponibilidad -->
+          <div class="aside-card__badge">
+            <span class="badge-dot"></span>
+            <span>{{ 'experience.aside_badge' | translate }}</span>
+          </div>
+
+          <span class="aside-card__icon">◎</span>
+          <h3 class="aside-card__title">{{ 'experience.aside_title' | translate }}</h3>
+          <p class="aside-card__text">
+            {{ 'experience.aside_text' | translate }}
+          </p>
+
+          <button class="btn btn--outline" (click)="openTimeline()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            {{ 'experience.aside_btn' | translate }}
+          </button>
+
+          <!-- CV -->
+          <div class="aside-card__cv">
+            <span class="cv-label">{{ 'experience.aside_cv_label' | translate }}</span>
+            <button class="cv-link" (click)="openPdfViewer()">
+              {{ 'experience.aside_cv_btn' | translate }}
+            </button>
+          </div>
+
+          <div class="aside-card__stats">
+            <div class="mini-stat">
+              <strong>4+</strong>
+              <span>{{ 'experience.aside_stat_years' | translate }}</span>
+            </div>
+            <div class="mini-stat">
+              <strong>3</strong>
+              <span>{{ 'experience.aside_stat_companies' | translate }}</span>
+            </div>
+            <div class="mini-stat">
+              <strong>8+</strong>
+              <span>{{ 'experience.aside_stat_projects' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     STACK — #stack
+════════════════════════════════════════════════════ -->
+<section id="stack" class="section section--stack">
+  <!-- 3D rotating cubes canvas — Animus style -->
+  <canvas #stackCanvas class="stack-bg-canvas" aria-hidden="true"></canvas>
+  <!-- Subtle scan line overlay -->
+  <div class="stack-bg-scan" aria-hidden="true"></div>
+  <!-- HUD corners -->
+  <div class="stack-bg-hud" aria-hidden="true">
+    <span class="hud-corner tl"></span>
+    <span class="hud-corner tr"></span>
+    <span class="hud-corner bl"></span>
+    <span class="hud-corner br"></span>
+  </div>
+  <div class="container" style="position: relative; z-index: 1">
+    <header class="section__header">
+      <span class="section__tag">{{ 'stack.tag' | translate }}</span>
+      <h2 class="section__title">{{ 'stack.title' | translate }}<span class="accent">.</span></h2>
+      <p class="section__subtitle">
+        {{ 'stack.subtitle' | translate }}
+      </p>
+    </header>
+
+    <div class="stack-grid">
+      @for (skill of stack; track skill.category) {
+        <div class="skill-card">
+          <div class="skill-card__header">
+            <span class="skill-card__icon">{{ skill.icon }}</span>
+            <h3 class="skill-card__category">{{ skill.category | translate }}</h3>
+          </div>
+          <ul class="skill-card__list">
+            @for (item of skill.items; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SOBRE MÍ — #about
+════════════════════════════════════════════════════ -->
+<section id="about" class="section section--dark">
+  <div class="container">
+    <div class="about-layout">
+      <div class="about-text">
+        <span class="section__tag">{{ 'about.tag' | translate }}</span>
+        <h2 class="section__title">
+          {{ 'about.title_line1' | translate }}<br />{{ 'about.title_line2' | translate
+          }}<span class="accent">.</span>
+        </h2>
+        <p class="about-lead">
+          {{ 'about.lead' | translate }}
+        </p>
+        <p class="about-body">
+          {{ 'about.body1' | translate }}
+        </p>
+        <p class="about-body">
+          {{ 'about.body2' | translate }}
+        </p>
+        <div class="about-actions">
+          <button class="btn btn--primary" (click)="openWhatsapp()">
+            {{ 'about.cta_talk' | translate }}
+          </button>
+          <button class="btn btn--ghost" (click)="openPdfViewer()">
+            {{ 'about.cta_cv' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="about-visual">
+        <div class="about-photo-placeholder">
+          <span class="about-initials">TN</span>
+        </div>
+        <div class="about-floating-tag about-floating-tag--1">
+          <span>Angular Expert</span>
+        </div>
+        <div class="about-floating-tag about-floating-tag--2">
+          <span>Clean Code</span>
+        </div>
+        <div class="about-floating-tag about-floating-tag--3">
+          <span>UI / UX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CONTACTO — #contact
+════════════════════════════════════════════════════ -->
+<section id="contact" class="section contact-section">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-left">
+        <span class="section__tag">{{ 'contact.tag' | translate }}</span>
+        <h2 class="contact-title">
+          {{ 'contact.title_line1' | translate }}<br />{{ 'contact.title_line2' | translate
+          }}<span class="accent">?</span>
+        </h2>
+        <p class="contact-subtitle">
+          {{ 'contact.subtitle' | translate }}
+        </p>
+        <div class="contact-methods">
+          <button class="contact-method" (click)="openWhatsapp()">
+            <div class="contact-method__icon contact-method__icon--wa">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+                />
+                <path
+                  d="M12 0C5.373 0 0 5.373 0 12c0 2.135.558 4.141 1.535 5.878L.057 23.57a.75.75 0 0 0 .93.925l5.823-1.529A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.73 9.73 0 0 1-4.964-1.358l-.356-.21-3.688.969.982-3.594-.232-.369A9.714 9.714 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"
+                />
+              </svg>
+            </div>
+            <div>
+              <strong>{{ 'contact.wa_label' | translate }}</strong>
+              <span>{{ 'contact.wa_value' | translate }}</span>
+            </div>
+          </button>
+          <button class="contact-method" (click)="openEmail()">
+            <div class="contact-method__icon contact-method__icon--email">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </div>
+            <div>
+              <strong>{{ 'contact.email_label' | translate }}</strong>
+              <span>{{ 'contact.email_value' | translate }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="contact-right">
+        <div class="contact-form-card">
+          <div class="form-group">
+            <label>{{ 'contact.form_name' | translate }}</label>
+            <input type="text" placeholder="Tu nombre completo" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'contact.form_email' | translate }}</label>
+            <input type="email" placeholder="tu@email.com" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'contact.form_message' | translate }}</label>
+            <textarea rows="4" placeholder="Cuéntame sobre tu proyecto..."></textarea>
+          </div>
+          <button class="btn btn--primary btn--full">
+            {{ 'contact.form_submit' | translate }}
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL CERTIFICADOS
+════════════════════════════════════════════════════ -->
+@if (certModalOpen()) {
+  <app-certificates-modal [isOpen]="certModalOpen()" (close)="closeCertificates()" />
+}
+
+@if (pdfViewerOpen()) {
+  <app-pdf-viewer-modal (close)="closePdfViewer()" />
+}
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHATBOT — bottom left (mirrored to scroll-top on right)
+════════════════════════════════════════════════════════════════ -->
+<app-chatbot />

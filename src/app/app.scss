@@ -1,0 +1,53 @@
+// ─── Reset & base ─────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #080808;
+  color: #e8e6e0;
+  font-family:
+    'DM Sans',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+// ─── Main content offset for fixed navbar ────────────────────────────────────
+.main-content {
+  min-height: 100vh;
+  padding-top: 72px; // matches --nav-height
+}
+
+// ─── Scrollbar personalizado ─────────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.35);
+  border-radius: 2px;
+
+  &:hover {
+    background: rgba(201, 168, 76, 0.6);
+  }
+}
+
+// ─── Selection color ─────────────────────────────────────────────────────────
+::selection {
+  background: rgba(201, 168, 76, 0.3);
+  color: #fff;
+}

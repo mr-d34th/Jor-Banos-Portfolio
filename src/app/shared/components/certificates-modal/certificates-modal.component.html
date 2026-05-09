@@ -1,0 +1,146 @@
+<div
+  class="cm-overlay"
+  (click)="onOverlayClick($event)"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Certificados"
+>
+  <div class="cm-panel">
+    <!-- Header -->
+    <div class="cm-header">
+      <div class="cm-header__left">
+        <span class="cm-header__badge">◈ CREDENTIALS</span>
+        <h2 class="cm-header__title">{{ 'certificates.modal_title' | translate }}</h2>
+        <p class="cm-header__subtitle">{{ 'certificates.modal_subtitle' | translate }}</p>
+      </div>
+      <button
+        class="cm-close"
+        (click)="onClose()"
+        [attr.aria-label]="'certificates.btn_close' | translate"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search + filters -->
+    <div class="cm-controls">
+      <div class="cm-search">
+        <svg
+          class="cm-search__icon"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          class="cm-search__input"
+          [placeholder]="'certificates.search_placeholder' | translate"
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+      </div>
+
+      <div class="cm-filters" role="group">
+        @for (cat of categories; track cat) {
+          <button
+            class="cm-filter-btn"
+            [class.active]="activeFilter() === cat"
+            (click)="setFilter(cat)"
+          >
+            {{ getCategoryFilterKey(cat) | translate }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Grid of certificates -->
+    <div class="cm-grid">
+      @if (filteredCertificates().length === 0) {
+        <div class="cm-empty">
+          <span>{{ 'certificates.no_results' | translate }}</span>
+        </div>
+      }
+
+      @for (cert of filteredCertificates(); track cert.id) {
+        <div class="cm-card" [attr.data-category]="cert.category">
+          <!-- Top row: badge + category + date -->
+          <div class="cm-card__top">
+            <span class="cm-card__badge-icon">{{ cert.badge }}</span>
+            <span class="cm-card__category">{{
+              getCategoryFilterKey(cert.category) | translate
+            }}</span>
+            <span class="cm-card__date">{{ formatDate(cert.date) }}</span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="cm-card__title">{{ cert.title }}</h3>
+
+          <!-- Institution -->
+          <p class="cm-card__institution">
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              style="flex-shrink: 0"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            {{ cert.institution }}
+          </p>
+
+          <!-- Footer with PDF button -->
+          <div class="cm-card__footer">
+            <a
+              [href]="cert.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="cm-card__btn"
+              [attr.aria-label]="'Ver PDF: ' + cert.title"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="9" y1="13" x2="15" y2="13" />
+                <line x1="9" y1="17" x2="15" y2="17" />
+              </svg>
+              {{ 'certificates.btn_view_pdf' | translate }}
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer counter -->
+    <div class="cm-footer">
+      <span class="cm-footer__count">
+        {{ filteredCertificates().length }} / {{ certificates.length }}
+      </span>
+    </div>
+  </div>
+</div>

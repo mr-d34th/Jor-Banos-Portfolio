@@ -1,0 +1,259 @@
+<div class="pv-overlay" (click)="onOverlayClick($event)" role="dialog" aria-modal="true">
+  <div class="pv-panel">
+    <!-- TOP BAR -->
+    <div class="pv-topbar">
+      <div class="pv-topbar__info">
+        <div class="pv-topbar__icon">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+        </div>
+        <div class="pv-topbar__meta">
+          <span class="pv-topbar__label">CURRICULUM VITAE</span>
+          <div class="pv-topbar__name-row">
+            <span class="pv-topbar__filename">{{ fileName }}</span>
+            <span class="pv-lang-badge" [class.pv-lang-badge--en]="!isES">{{ langBadge }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zoom controls -->
+      <div class="pv-topbar__zoom">
+        <button class="pv-icon-btn" (click)="zoomOut()" [disabled]="zoom() <= 0.5" title="Reducir">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+        <button class="pv-zoom-display" (click)="resetZoom()">{{ zoomPct }}%</button>
+        <button class="pv-icon-btn" (click)="zoomIn()" [disabled]="zoom() >= 2.5" title="Ampliar">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="11" y1="8" x2="11" y2="14" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Actions -->
+      <div class="pv-topbar__actions">
+        <button class="pv-action-btn pv-action-btn--ghost" (click)="openInNewTab()">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+          <span class="pv-btn-label">{{ isES ? 'Abrir' : 'Open' }}</span>
+        </button>
+        <button class="pv-action-btn pv-action-btn--ghost" (click)="print()">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          <span class="pv-btn-label">{{ isES ? 'Imprimir' : 'Print' }}</span>
+        </button>
+        <button class="pv-action-btn pv-action-btn--primary" (click)="download()">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          {{ isES ? 'Descargar PDF' : 'Download PDF' }}
+        </button>
+        <button class="pv-close-btn" (click)="onClose()">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- LANG NOTICE -->
+    <div class="pv-lang-notice">
+      <svg
+        width="11"
+        height="11"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        style="flex-shrink: 0"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+      @if (isES) {
+        <span
+          >Mostrando CV en <strong>Español</strong>. Cambia el idioma para ver la versión en
+          inglés.</span
+        >
+      } @else {
+        <span
+          >Showing CV in <strong>English</strong>. Switch language to see the Spanish version.</span
+        >
+      }
+    </div>
+
+    <!-- PDF VIEWER — canvas renderizado por pdf.js -->
+    <div class="pv-viewer" #pdfContainer>
+      @if (loading()) {
+        <div class="pv-loading">
+          <div class="pv-loading__spinner"><div class="pv-loading__ring"></div></div>
+          <p class="pv-loading__text">{{ isES ? 'RENDERIZANDO PDF...' : 'RENDERING PDF...' }}</p>
+          <p class="pv-loading__sub">pdf.js · sin conexión requerida</p>
+        </div>
+      }
+
+      @if (loadError()) {
+        <div class="pv-error">
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p>{{ isES ? 'No se pudo cargar el PDF.' : 'Could not load the PDF.' }}</p>
+          <div class="pv-error__actions">
+            <button class="pv-action-btn pv-action-btn--primary" (click)="openInNewTab()">
+              {{ isES ? 'Abrir en nueva pestaña' : 'Open in new tab' }}
+            </button>
+            <button class="pv-action-btn pv-action-btn--ghost" (click)="download()">
+              {{ isES ? 'Descargar PDF' : 'Download PDF' }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Canvas donde pdf.js renderiza cada página -->
+      <div class="pv-canvas-wrap" [class.pv-hidden]="loading() || loadError()">
+        <canvas #pdfCanvas class="pv-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- BOTTOM BAR — paginación + ESC hint -->
+    <div class="pv-bottombar">
+      <!-- Pagination -->
+      <div class="pv-pagination" [class.pv-hidden]="totalPages() === 0">
+        <button class="pv-page-btn" (click)="prevPage()" [disabled]="currentPage() <= 1">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="pv-page-info"> {{ currentPage() }} / {{ totalPages() }} </span>
+        <button class="pv-page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages()">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        <span class="pv-page-hint">{{ isES ? '← → teclado' : '← → keyboard' }}</span>
+      </div>
+
+      <span class="pv-bottombar__hint">
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <kbd>ESC</kbd> {{ isES ? 'para cerrar' : 'to close' }}
+      </span>
+
+      <!-- Mobile download -->
+      <button class="pv-action-btn pv-action-btn--primary pv-download-mobile" (click)="download()">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        {{ isES ? 'Descargar' : 'Download' }}
+      </button>
+    </div>
+  </div>
+</div>

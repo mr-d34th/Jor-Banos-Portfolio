@@ -1,0 +1,58 @@
+@keyframes float-btn {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.scroll-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 900;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 2px;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  background: rgba(8, 8, 12, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  color: #c9a84c;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Hidden by default
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+    animation: float-btn 2.5s ease-in-out infinite;
+  }
+
+  &:hover {
+    background: #c9a84c;
+    border-color: #c9a84c;
+    color: #080808;
+    animation-play-state: paused;
+  }
+
+  svg {
+    display: block;
+  }
+}

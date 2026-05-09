@@ -1,0 +1,140 @@
+<canvas #bgCanvas class="lt-canvas"></canvas>
+
+<!-- FX Layers -->
+<div class="lt-scanlines"></div>
+<div class="lt-grid"></div>
+
+<div class="lt-flash" [class.active]="flashActive()"></div>
+
+<!-- HUD -->
+<div class="lt-hud" aria-hidden="true">
+  <div class="hud-corner tl"></div>
+  <div class="hud-corner tr"></div>
+  <div class="hud-corner bl"></div>
+  <div class="hud-corner br"></div>
+
+  <span class="hud-text tl">ANIMUS v4.7.1</span>
+  <span class="hud-text tr">{{ hudTime() }}</span>
+  <span class="hud-text bl">SYNC_STABILITY: 97.3%</span>
+  <span class="hud-text br">MEM_ALLOC: OK</span>
+</div>
+
+<!-- TOP CONTROLS -->
+<div class="lt-top-controls">
+  <button class="ctrl-btn ctrl-btn--always" (click)="goBack()" aria-label="Volver al portfolio">
+    {{ 'timeline.btn_back' | translate }}
+  </button>
+
+  <button class="ctrl-btn ctrl-btn--audio" (click)="toggleAudio()" aria-label="Toggle audio">
+    <span class="audio-dot" [class.active]="!muted()"></span>
+
+    {{ muted() ? ('timeline.btn_unmute' | translate) : ('timeline.btn_mute' | translate) }}
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TIMELINE -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="lt-timeline visible" role="main">
+  <!-- HEADER -->
+  <header class="tl-header">
+    <div>
+      <p class="tl-sys">
+        {{ 'timeline.system_label' | translate }}
+      </p>
+
+      <h2 class="tl-heading">
+        {{ 'timeline.heading' | translate }}
+
+        <span class="tl-heading--accent">
+          {{ 'timeline.heading_accent' | translate }}
+        </span>
+      </h2>
+    </div>
+
+    <button
+      class="ctrl-btn"
+      [class.ctrl-btn--always]="activeIndex() !== null"
+      (click)="closeActive()"
+      aria-label="Cerrar memoria activa"
+    >
+      {{ 'timeline.btn_close' | translate }}
+    </button>
+  </header>
+
+  <!-- TRACK -->
+  <div class="track-wrap">
+    <div class="track-line" aria-hidden="true"></div>
+
+    @for (mem of memories; track mem.originKey; let i = $index) {
+      <article
+        class="node"
+        [class.node--even]="i % 2 === 1"
+        [class.node--active]="activeIndex() === i"
+        (click)="toggleMemory(i)"
+      >
+        <!-- CENTER DOT -->
+        <div class="node-dot" aria-hidden="true"></div>
+
+        <!-- CARD -->
+        <div class="node-card" [attr.aria-expanded]="activeIndex() === i">
+          <!-- TAG -->
+          <p class="card-tag">
+            {{ 'timeline.mem_tag_prefix' | translate }}
+
+            {{ (i + 1).toString().padStart(2, '0') }}
+          </p>
+
+          <!-- ROLE -->
+          <h3 class="card-role">
+            {{ mem.roleKey | translate }}
+          </h3>
+
+          <!-- ORIGIN -->
+          <p class="card-origin">
+            [
+            {{ 'timeline.system_origin' | translate }}:
+
+            <span class="card-origin--accent">
+              {{ mem.originKey | translate }}
+            </span>
+
+            //
+
+            {{ mem.yearKey | translate }}
+            ]
+          </p>
+
+          <!-- EXPANDABLE -->
+          <div class="card-body">
+            <!-- DNA -->
+            <p class="card-section-label">
+              {{ 'timeline.section_dna' | translate }}
+            </p>
+
+            <ul class="dna-list">
+              @for (dnaKey of mem.dnaKeys; track dnaKey) {
+                <li>
+                  {{ dnaKey | translate }}
+                </li>
+              }
+            </ul>
+
+            <!-- SKILLS -->
+            <p class="card-section-label">
+              {{ 'timeline.section_skills' | translate }}
+            </p>
+
+            <div class="skill-chips">
+              @for (skill of mem.skills; track skill) {
+                <span class="chip">
+                  {{ skill }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+</div>
