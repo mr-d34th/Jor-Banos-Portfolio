@@ -4,7 +4,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./features/home/home.component').then((m) => m.HomeComponent),
-    title: 'Portfolio | Tu Nombre',
+    title: 'Portfolio Dev JB',
   },
   {
     path: 'line-time',
