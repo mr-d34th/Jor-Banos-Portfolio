@@ -46,6 +46,6 @@ export class NavbarComponent {
   }
 
   openWhatsapp(): void {
-    window.open('https://wa.me/51999999999', '_blank');
+    window.open('https://wa.me/51997025331', '_blank');
   }
 }
