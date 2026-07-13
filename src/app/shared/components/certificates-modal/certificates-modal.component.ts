@@ -62,14 +62,20 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
   );
 
   // ── PDF viewer DOM portal ────────────────────────────────────────────────────
-  // Creamos el viewer en document.body directamente para escapar de
-  // overflow:hidden del body/html y de cualquier stacking context padre
   private viewerEl: HTMLElement | null = null;
   private iframeEl: HTMLIFrameElement | null = null;
   private loadingEl: HTMLElement | null = null;
   private errorEl: HTMLElement | null = null;
+  private openBtnEl: HTMLAnchorElement | null = null;
 
   private blobUrls: string[] = [];
+
+  /** Detecta mobile/tablet — en estos dispositivos los blob: URL no se renderizan en iframe */
+  private isMobileDevice(): boolean {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      this.document.defaultView?.navigator?.userAgent ?? '',
+    );
+  }
 
   certificates: Certificate[] = [
     {
@@ -238,8 +244,6 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
   };
 
   // ── Portal: crea el viewer directamente en document.body ──────────────────────
-  // Esto escapa de CUALQUIER overflow:hidden, transform, o stacking context
-  // que pueda existir en los componentes padre
   private buildViewerPortal(): void {
     const doc = this.document;
 
@@ -343,7 +347,7 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
       font-size: 13px; text-align: center; padding: 2rem;
     `;
 
-    // iframe
+    // iframe (desktop)
     const iframe = doc.createElement('iframe');
     iframe.style.cssText = `
       display: none; flex: 1;
@@ -353,6 +357,72 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     `;
     iframe.setAttribute('type', 'application/pdf');
     iframe.setAttribute('title', 'Visor PDF');
+
+    // ── Fallback mobile: pantalla con botón "Abrir PDF" ──────────────────────
+    const mobileEl = doc.createElement('div');
+    mobileEl.style.cssText = `
+      display: none; flex: 1;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 24px; padding: 2rem; text-align: center;
+    `;
+
+    // Ícono PDF
+    const pdfIcon = doc.createElement('div');
+    pdfIcon.innerHTML = `
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+           stroke="rgba(201,168,76,0.7)" stroke-width="1.2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <text x="7" y="18" font-size="5" fill="rgba(201,168,76,0.7)"
+              stroke="none" font-family="monospace" font-weight="bold">PDF</text>
+      </svg>
+    `;
+
+    // Nombre del archivo (se actualiza dinámicamente)
+    const mobileFilename = doc.createElement('p');
+    mobileFilename.style.cssText = `
+      margin: 0;
+      font-size: 12px;
+      color: rgba(232,230,224,0.4);
+      letter-spacing: 0.06em;
+      font-family: monospace;
+      word-break: break-all;
+      max-width: 280px;
+    `;
+
+    // Botón "Abrir PDF" → target _blank para que el browser mobile lo abra en su visor nativo
+    const openBtn = doc.createElement('a');
+    openBtn.textContent = 'Abrir PDF';
+    openBtn.target = '_blank';
+    openBtn.rel = 'noopener noreferrer';
+    openBtn.style.cssText = `
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #c9a84c;
+      color: #09090f;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 14px 32px;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    `;
+
+    const hint = doc.createElement('p');
+    hint.textContent = 'Tu navegador abrirá el PDF en una nueva pestaña';
+    hint.style.cssText = `
+      margin: 0;
+      font-size: 11px;
+      color: rgba(232,230,224,0.3);
+      letter-spacing: 0.04em;
+    `;
+
+    mobileEl.appendChild(pdfIcon);
+    mobileEl.appendChild(mobileFilename);
+    mobileEl.appendChild(openBtn);
+    mobileEl.appendChild(hint);
 
     // Keyframe animation para el spinner
     if (!doc.getElementById('cm-portal-styles')) {
@@ -366,6 +436,7 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     viewer.appendChild(loadingEl);
     viewer.appendChild(errorEl);
     viewer.appendChild(iframe);
+    viewer.appendChild(mobileEl);
     doc.body.appendChild(viewer);
 
     // Guardar referencias
@@ -373,9 +444,11 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     this.iframeEl = iframe;
     this.loadingEl = loadingEl;
     this.errorEl = errorEl;
+    this.openBtnEl = openBtn;
 
-    // Guardar referencia al título para actualizarlo después
     (viewer as any)._titleEl = titleEl;
+    (viewer as any)._mobileEl = mobileEl;
+    (viewer as any)._mobileFilename = mobileFilename;
   }
 
   private destroyViewerPortal(): void {
@@ -393,15 +466,36 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     this.loadingEl!.style.display = 'flex';
     this.iframeEl!.style.display = 'none';
     this.errorEl!.style.display = 'none';
+    (this.viewerEl as any)._mobileEl.style.display = 'none';
     this.iframeEl!.src = '';
   }
 
-  private showIframe(blobUrl: string): void {
+  private showIframe(src: string): void {
     if (!this.viewerEl) return;
-    this.iframeEl!.src = blobUrl;
+    this.iframeEl!.src = src;
     this.loadingEl!.style.display = 'none';
     this.iframeEl!.style.display = 'flex';
     this.errorEl!.style.display = 'none';
+    (this.viewerEl as any)._mobileEl.style.display = 'none';
+  }
+
+  /**
+   * Muestra la pantalla de fallback mobile con un link directo al PDF.
+   * El browser mobile (Chrome Android, Safari iOS) abre el PDF en su
+   * visor nativo al tocar "Abrir PDF".
+   */
+  private showMobileFallback(directUrl: string, filename: string): void {
+    if (!this.viewerEl) return;
+    const mobileEl = (this.viewerEl as any)._mobileEl as HTMLElement;
+    const mobileFilename = (this.viewerEl as any)._mobileFilename as HTMLElement;
+
+    this.openBtnEl!.href = directUrl;
+    mobileFilename.textContent = filename;
+
+    this.loadingEl!.style.display = 'none';
+    this.iframeEl!.style.display = 'none';
+    this.errorEl!.style.display = 'none';
+    mobileEl.style.display = 'flex';
   }
 
   private showError(msg: string): void {
@@ -421,19 +515,47 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     this.loadingEl!.style.display = 'none';
     this.iframeEl!.style.display = 'none';
     this.errorEl!.style.display = 'flex';
+    (this.viewerEl as any)._mobileEl.style.display = 'none';
   }
 
   closePdfViewer(): void {
     if (this.viewerEl) {
       this.viewerEl.style.display = 'none';
       this.iframeEl!.src = '';
+      if (this.openBtnEl) this.openBtnEl.href = '';
     }
   }
 
-  // ── Carga el PDF como blob y lo muestra en el portal ─────────────────────────
+  // ── Carga el PDF ─────────────────────────────────────────────────────────────
   async viewPdf(cert: Certificate): Promise<void> {
     this.showLoading(cert.title);
 
+    // En mobile NO usamos blob URL (no se renderizan en iframe).
+    // Usamos la URL directa del asset y abrimos el visor nativo del browser.
+    if (this.isMobileDevice()) {
+      // Verificamos primero que el archivo existe con un HEAD request
+      try {
+        const check = await fetch(cert.url, { method: 'HEAD', cache: 'no-cache' });
+        if (!check.ok) throw new Error(`HTTP_${check.status}`);
+        const ct = check.headers.get('content-type') ?? '';
+        if (ct.includes('text/html')) throw new Error('NOT_FOUND');
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg === 'NOT_FOUND' || msg.startsWith('HTTP_')) {
+          this.closePdfViewer();
+        } else {
+          this.showError(`No se pudo verificar el archivo`);
+        }
+        return;
+      }
+
+      // Archivo existe → mostrar fallback con link directo
+      const filename = cert.url.split('/').pop() ?? cert.title;
+      this.showMobileFallback(cert.url, filename);
+      return;
+    }
+
+    // Desktop: comportamiento original con blob URL
     try {
       const response = await fetch(cert.url, {
         method: 'GET',
@@ -456,7 +578,6 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'NOT_FOUND') {
-        // Archivo no existe — cerrar silenciosamente
         this.closePdfViewer();
       } else {
         this.showError(`Error al cargar: ${msg}`);
