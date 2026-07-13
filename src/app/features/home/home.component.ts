@@ -8,6 +8,7 @@ import {
   ElementRef,
   ViewChild,
   PLATFORM_ID,
+  NgZone,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -97,8 +98,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private ngZone = inject(NgZone);
   private isBrowser = false;
   private translate = inject(TranslationService);
+  // true en móvil/táctil o si el usuario pidió "reducir movimiento":
+  // en esos casos NO iniciamos los canvas decorativos (cubos 3D + cursor de humo).
+  private skipDecorativeCanvas = false;
 
   certModalOpen = signal(false);
   pdfViewerOpen = signal(false);
@@ -196,13 +201,31 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (!this.isBrowser) return;
 
-    // Stack cubes canvas
-    if (this.stackCanvasRef) this.initStackCanvas();
+    // pointer: coarse = dispositivo táctil (celular/tablet). Ahí no existe
+    // un cursor real, así que el "humo" que sigue al mouse no tiene sentido,
+    // y los cubos 3D de fondo son puramente decorativos: no vale la pena
+    // pagar su costo de CPU/GPU mientras el usuario hace scroll.
+    const isCoarsePointer =
+      typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    const prefersReducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.skipDecorativeCanvas = isCoarsePointer || prefersReducedMotion;
 
-    // Global smoke cursor canvas
-    if (this.smokeCanvasRef) this.initSmokeCanvas();
+    if (this.skipDecorativeCanvas) return;
 
-    window.addEventListener('resize', this.onResize);
+    // Todo lo de aquí abajo corre FUERA del NgZone: son listeners de
+    // mousemove/resize y loops de requestAnimationFrame que no tocan ningún
+    // estado enlazado a la plantilla. Si se dejan dentro del zone, cada
+    // movimiento de mouse y cada frame (60/seg) dispara un ciclo completo de
+    // change detection en TODA la app — incluyendo los pipes de traducción,
+    // que son "impure" y se recalculan en cada ciclo. Sacarlo del zone evita
+    // ese costo invisible que se siente como lentitud general.
+    this.ngZone.runOutsideAngular(() => {
+      if (this.stackCanvasRef) this.initStackCanvas();
+      if (this.smokeCanvasRef) this.initSmokeCanvas();
+      window.addEventListener('resize', this.onResize);
+    });
   }
 
   ngOnDestroy(): void {

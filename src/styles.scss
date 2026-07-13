@@ -5,3 +5,17 @@
 body {
   margin: 0;
 }
+
+/* Respeta la preferencia del sistema de "reducir movimiento":
+   desactiva animaciones/transiciones decorativas infinitas
+   (grid, scan-lines, partículas, cubos, etc.) en todo el sitio. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

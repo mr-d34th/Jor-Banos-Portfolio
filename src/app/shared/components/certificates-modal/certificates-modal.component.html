@@ -54,7 +54,6 @@
           (input)="searchQuery.set($any($event.target).value)"
         />
       </div>
-
       <div class="cm-filters" role="group">
         @for (cat of categories; track cat) {
           <button
@@ -68,7 +67,7 @@
       </div>
     </div>
 
-    <!-- Grid of certificates -->
+    <!-- Grid -->
     <div class="cm-grid">
       @if (filteredCertificates().length === 0) {
         <div class="cm-empty">
@@ -78,19 +77,21 @@
 
       @for (cert of filteredCertificates(); track cert.id) {
         <div class="cm-card" [attr.data-category]="cert.category">
-          <!-- Top row: badge + category + date -->
           <div class="cm-card__top">
             <span class="cm-card__badge-icon">{{ cert.badge }}</span>
-            <span class="cm-card__category">{{
-              getCategoryFilterKey(cert.category) | translate
-            }}</span>
-            <span class="cm-card__date">{{ formatDate(cert.date) }}</span>
+            <span class="cm-card__category">
+              {{ getCategoryFilterKey(cert.category) | translate }}
+            </span>
+            <div class="cm-card__top-right">
+              @if (cert.hours) {
+                <span class="cm-card__hours">{{ cert.hours }}</span>
+              }
+              <span class="cm-card__date">{{ formatDate(cert.date) }}</span>
+            </div>
           </div>
 
-          <!-- Title -->
           <h3 class="cm-card__title">{{ cert.title }}</h3>
 
-          <!-- Institution -->
           <p class="cm-card__institution">
             <svg
               width="11"
@@ -107,14 +108,11 @@
             {{ cert.institution }}
           </p>
 
-          <!-- Footer with PDF button -->
           <div class="cm-card__footer">
-            <a
-              [href]="cert.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="cm-card__btn"
-              [attr.aria-label]="'Ver PDF: ' + cert.title"
+            <button
+              type="button"
+              class="cm-card__btn cm-card__btn--primary"
+              (click)="viewPdf(cert)"
             >
               <svg
                 width="13"
@@ -130,16 +128,37 @@
                 <line x1="9" y1="17" x2="15" y2="17" />
               </svg>
               {{ 'certificates.btn_view_pdf' | translate }}
-            </a>
+            </button>
+
+            @if (cert.verifyUrl) {
+              <button
+                type="button"
+                class="cm-card__btn cm-card__btn--verify"
+                (click)="verifyOnline(cert)"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                {{ 'certificates.btn_verify' | translate }}
+              </button>
+            }
           </div>
         </div>
       }
     </div>
 
-    <!-- Footer counter -->
+    <!-- Footer -->
     <div class="cm-footer">
       <span class="cm-footer__count">
         {{ filteredCertificates().length }} / {{ certificates.length }}
+        {{ 'certificates.footer_label' | translate }}
       </span>
     </div>
   </div>

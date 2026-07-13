@@ -1,140 +1,237 @@
-<canvas #bgCanvas class="lt-canvas"></canvas>
+<canvas #bgCanvas class="lt-bg-canvas"></canvas>
 
-<!-- FX Layers -->
-<div class="lt-scanlines"></div>
-<div class="lt-grid"></div>
+<!-- Scanlines overlay -->
+<div class="lt-scanlines" aria-hidden="true"></div>
 
-<div class="lt-flash" [class.active]="flashActive()"></div>
+<!-- Mouse-reactive grid -->
+<div class="lt-grid" #gridEl aria-hidden="true"></div>
 
-<!-- HUD -->
+<!-- HUD corners -->
 <div class="lt-hud" aria-hidden="true">
-  <div class="hud-corner tl"></div>
-  <div class="hud-corner tr"></div>
-  <div class="hud-corner bl"></div>
-  <div class="hud-corner br"></div>
-
-  <span class="hud-text tl">ANIMUS v4.7.1</span>
-  <span class="hud-text tr">{{ hudTime() }}</span>
-  <span class="hud-text bl">SYNC_STABILITY: 97.3%</span>
-  <span class="hud-text br">MEM_ALLOC: OK</span>
+  <span class="hud-c tl"></span>
+  <span class="hud-c tr"></span>
+  <span class="hud-c bl"></span>
+  <span class="hud-c br"></span>
+  <span class="hud-label hl-tl">SYS.TIMELINE v2.6</span>
+  <span class="hud-label hl-tr">{{ hudTime() }}</span>
+  <span class="hud-label hl-bl">SCROLL_SYNC: {{ scrollPct() }}%</span>
+  <span class="hud-label hl-br">MEM: {{ memories().length }} NODES</span>
 </div>
 
-<!-- TOP CONTROLS -->
-<div class="lt-top-controls">
-  <button class="ctrl-btn ctrl-btn--always" (click)="goBack()" aria-label="Volver al portfolio">
-    {{ 'timeline.btn_back' | translate }}
+<!-- Controls -->
+<nav class="lt-controls" aria-label="Timeline navigation">
+  <button class="ctrl-btn" (click)="goBack()">
+    <span class="btn-icon">◂</span> {{ 'timeline.btn_back' | translate }}
   </button>
-
-  <button class="ctrl-btn ctrl-btn--audio" (click)="toggleAudio()" aria-label="Toggle audio">
-    <span class="audio-dot" [class.active]="!muted()"></span>
-
+  <button class="ctrl-btn ctrl-btn--audio" (click)="toggleAudio()">
+    <span class="audio-pip" [class.on]="!muted()"></span>
     {{ muted() ? ('timeline.btn_unmute' | translate) : ('timeline.btn_mute' | translate) }}
   </button>
-</div>
+</nav>
 
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- TIMELINE -->
-<!-- ════════════════════════════════════════════════════════ -->
-<div class="lt-timeline visible" role="main">
-  <!-- HEADER -->
-  <header class="tl-header">
-    <div>
-      <p class="tl-sys">
-        {{ 'timeline.system_label' | translate }}
-      </p>
+<!-- Flash burst -->
+<div class="lt-flash" [class.active]="flashActive()" aria-hidden="true"></div>
 
-      <h2 class="tl-heading">
-        {{ 'timeline.heading' | translate }}
+<!-- ══════════════════════════════════════════════ -->
+<!-- MAIN TIMELINE                                  -->
+<!-- ══════════════════════════════════════════════ -->
+<main class="lt-main" #scrollContainer (scroll)="onScroll($event)">
+  <!-- HERO HEADER -->
+  <header class="tl-hero" [class.revealed]="heroRevealed()">
+    <p class="tl-eyebrow">
+      @for (ch of eyebrowChars(); track $index) {
+        <span
+          class="char-reveal"
+          [class.visible]="heroRevealed()"
+          [style.transition-delay]="$index * 28 + 'ms'"
+          >{{ ch }}</span
+        >
+      }
+    </p>
 
-        <span class="tl-heading--accent">
-          {{ 'timeline.heading_accent' | translate }}
-        </span>
-      </h2>
+    <h1 class="tl-title">
+      @for (ch of titleChars(); track $index) {
+        <span
+          class="char-reveal title-word"
+          [class.visible]="heroRevealed()"
+          [style.transition-delay]="180 + $index * 22 + 'ms'"
+          >{{ ch }}</span
+        >
+      }
+    </h1>
+
+    <p class="tl-subtitle">
+      @for (ch of subtitleChars(); track $index) {
+        <span
+          class="char-reveal"
+          [class.visible]="heroRevealed()"
+          [style.transition-delay]="520 + $index * 14 + 'ms'"
+          >{{ ch }}</span
+        >
+      }
+    </p>
+
+    <div class="tl-scroll-hint" [class.hidden]="scrollPct() > 5">
+      <span class="scroll-arr">↓</span>
+      <span class="scroll-txt">{{ 'timeline.scroll_hint' | translate }}</span>
     </div>
-
-    <button
-      class="ctrl-btn"
-      [class.ctrl-btn--always]="activeIndex() !== null"
-      (click)="closeActive()"
-      aria-label="Cerrar memoria activa"
-    >
-      {{ 'timeline.btn_close' | translate }}
-    </button>
   </header>
 
-  <!-- TRACK -->
-  <div class="track-wrap">
-    <div class="track-line" aria-hidden="true"></div>
+  <!-- PROGRESS RAIL -->
+  <div class="tl-rail" aria-hidden="true">
+    <div class="rail-fill" [style.height.%]="scrollPct()"></div>
+    <div class="rail-glow" [style.top.%]="scrollPct()"></div>
+  </div>
 
-    @for (mem of memories; track mem.originKey; let i = $index) {
-      <article
-        class="node"
-        [class.node--even]="i % 2 === 1"
-        [class.node--active]="activeIndex() === i"
-        (click)="toggleMemory(i)"
+  <!-- ── EXPERIENCE NODES ─────────────────────────────────────── -->
+  <ol class="tl-nodes" role="list">
+    @for (mem of memories(); track mem.id; let i = $index) {
+      <li
+        class="tl-node"
+        [class.node--left]="i % 2 === 0"
+        [class.node--right]="i % 2 === 1"
+        [class.node--visible]="visibleNodes()[i]"
+        [class.node--active]="activeNode() === i"
+        [attr.aria-label]="mem.company + ' — ' + mem.role"
+        #nodeEl
       >
-        <!-- CENTER DOT -->
-        <div class="node-dot" aria-hidden="true"></div>
+        <!-- Connector dot -->
+        <div
+          class="node-dot"
+          (click)="toggleNode(i)"
+          role="button"
+          [attr.aria-expanded]="activeNode() === i"
+        >
+          <span class="dot-ring"></span>
+          <span class="dot-core"></span>
+          <span class="dot-idx">{{ (i + 1).toString().padStart(2, '0') }}</span>
+        </div>
+
+        <!-- Horizontal connector line -->
+        <div class="node-connector"></div>
 
         <!-- CARD -->
-        <div class="node-card" [attr.aria-expanded]="activeIndex() === i">
-          <!-- TAG -->
-          <p class="card-tag">
-            {{ 'timeline.mem_tag_prefix' | translate }}
+        <article class="node-card" (click)="toggleNode(i)">
+          <span class="card-shimmer" aria-hidden="true"></span>
 
-            {{ (i + 1).toString().padStart(2, '0') }}
+          <!-- Badge -->
+          <div class="card-badge">
+            <span class="badge-type">{{ mem.type }}</span>
+            <span class="badge-period">{{ mem.period }}</span>
+          </div>
+
+          <!-- Company — char reveal -->
+          <p class="card-company">
+            @for (ch of getChars(mem.company); track $index) {
+              <span
+                class="char-reveal"
+                [class.visible]="visibleNodes()[i]"
+                [style.transition-delay]="100 + $index * 18 + 'ms'"
+                >{{ ch }}</span
+              >
+            }
           </p>
 
-          <!-- ROLE -->
-          <h3 class="card-role">
-            {{ mem.roleKey | translate }}
-          </h3>
+          <!-- Role — char reveal -->
+          <h2 class="card-role">
+            @for (ch of getChars(mem.role); track $index) {
+              <span
+                class="char-reveal"
+                [class.visible]="visibleNodes()[i]"
+                [style.transition-delay]="220 + $index * 12 + 'ms'"
+                >{{ ch }}</span
+              >
+            }
+          </h2>
 
-          <!-- ORIGIN -->
-          <p class="card-origin">
-            [
-            {{ 'timeline.system_origin' | translate }}:
+          <!-- Location + contract -->
+          <div class="card-meta">
+            <span class="meta-loc">⌖ {{ mem.location }}</span>
+            <span class="meta-contract">{{ mem.contract }}</span>
+          </div>
 
-            <span class="card-origin--accent">
-              {{ mem.originKey | translate }}
-            </span>
+          <!-- ── Expandable body ───────────────────────────────── -->
+          <div class="card-body" [class.open]="activeNode() === i">
+            <p class="card-context">{{ mem.context }}</p>
 
-            //
+            <!-- Achievements -->
+            <div class="card-section">
+              <p class="section-label">{{ 'timeline.label_achievements' | translate }}</p>
+              <ul class="achievement-list">
+                @for (a of mem.achievements; track $index) {
+                  <li>
+                    @if (a.metric) {
+                      <span class="ach-metric">{{ a.metric }}</span>
+                    }
+                    {{ a.text }}
+                  </li>
+                }
+              </ul>
+            </div>
 
-            {{ mem.yearKey | translate }}
-            ]
-          </p>
+            <!-- Responsibilities -->
+            <div class="card-section">
+              <p class="section-label">{{ 'timeline.label_responsibilities' | translate }}</p>
+              <ul class="resp-list">
+                @for (r of mem.responsibilities; track $index) {
+                  <li>{{ r }}</li>
+                }
+              </ul>
+            </div>
 
-          <!-- EXPANDABLE -->
-          <div class="card-body">
-            <!-- DNA -->
-            <p class="card-section-label">
-              {{ 'timeline.section_dna' | translate }}
-            </p>
-
-            <ul class="dna-list">
-              @for (dnaKey of mem.dnaKeys; track dnaKey) {
-                <li>
-                  {{ dnaKey | translate }}
-                </li>
-              }
-            </ul>
-
-            <!-- SKILLS -->
-            <p class="card-section-label">
-              {{ 'timeline.section_skills' | translate }}
-            </p>
-
-            <div class="skill-chips">
-              @for (skill of mem.skills; track skill) {
-                <span class="chip">
-                  {{ skill }}
-                </span>
-              }
+            <!-- Tech stack -->
+            <div class="card-section">
+              <p class="section-label">{{ 'timeline.label_stack' | translate }}</p>
+              <div class="chip-grid">
+                @for (skill of mem.skills; track skill) {
+                  <span class="chip" [class.chip--primary]="mem.primarySkills.includes(skill)">{{
+                    skill
+                  }}</span>
+                }
+              </div>
             </div>
           </div>
-        </div>
-      </article>
+          <!-- /card-body -->
+
+          <!-- Expand toggle -->
+          <button
+            class="card-toggle"
+            (click)="toggleNode(i); $event.stopPropagation()"
+            [attr.aria-expanded]="activeNode() === i"
+          >
+            <span class="toggle-icon">
+              {{
+                activeNode() === i
+                  ? ('timeline.label_collapse' | translate)
+                  : ('timeline.label_expand' | translate)
+              }}
+            </span>
+          </button>
+        </article>
+      </li>
     }
-  </div>
-</div>
+  </ol>
+
+  <!-- ── EDUCATION ────────────────────────────────────────────── -->
+  <section class="tl-education" [class.revealed]="eduRevealed()">
+    <h2 class="edu-title">{{ 'timeline.edu_title' | translate }}</h2>
+    <div class="edu-grid">
+      @for (edu of education(); track $index) {
+        <div class="edu-card" [class.revealed]="eduRevealed()">
+          <span class="edu-year">{{ edu.year }}</span>
+          <h3 class="edu-inst">{{ edu.institution }}</h3>
+          <p class="edu-degree">{{ edu.degree }}</p>
+          @if (edu.certs && edu.certs.length) {
+            <div class="edu-certs">
+              @for (c of edu.certs; track $index) {
+                <span class="cert-chip">{{ c }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="tl-end-spacer"></div>
+</main>

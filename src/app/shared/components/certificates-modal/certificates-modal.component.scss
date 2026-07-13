@@ -38,7 +38,7 @@
 .cm-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: 10000; // encima del smoke-canvas del home (z-index: 9999)
   background: rgba(2, 4, 8, 0.9);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -303,6 +303,27 @@
     white-space: nowrap;
   }
 
+  // top-right wraps hours + date
+  &__top-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &__hours {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    opacity: 0.7;
+    background: rgba(201, 168, 76, 0.08);
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+
   &__date {
     font-family: var(--font-mono);
     font-size: 8px;
@@ -357,13 +378,24 @@
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  // ── PDF Button — full width, always visible ──
+  // ── Footer — flex row para múltiples botones ──
+  &__footer {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  // ── Botón base ──
   &__btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     border: 1px solid var(--gold-border);
     color: var(--gold);
     background: transparent;
@@ -371,11 +403,12 @@
     font-size: 9px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    padding: 8px 12px;
+    padding: 8px 10px;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.2s ease;
     box-sizing: border-box;
+    white-space: nowrap;
 
     svg {
       flex-shrink: 0;
@@ -386,9 +419,41 @@
       border-color: var(--gold);
       transform: translateY(-1px);
     }
-
     &:active {
       transform: translateY(0);
+    }
+
+    // Variante verificar — color diferenciador (verde/teal)
+    &--verify {
+      border-color: rgba(6, 182, 212, 0.28);
+      color: rgba(6, 182, 212, 0.85);
+      background: transparent;
+
+      &:hover {
+        background: rgba(6, 182, 212, 0.08);
+        border-color: rgba(6, 182, 212, 0.7);
+        color: #06b6d4;
+        transform: translateY(-1px);
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.12);
+      }
+    }
+  }
+
+  // ── Categoría WORK — color diferente (gris-azulado) ──
+  &[data-category='work'] {
+    .cm-card__category {
+      color: rgba(148, 163, 184, 0.8);
+    }
+    .cm-card__badge-icon {
+      color: rgba(148, 163, 184, 0.6);
+    }
+    .cm-card__btn--primary {
+      border-color: rgba(148, 163, 184, 0.25);
+      color: rgba(148, 163, 184, 0.8);
+      &:hover {
+        background: rgba(148, 163, 184, 0.06);
+        border-color: rgba(148, 163, 184, 0.55);
+      }
     }
   }
 }
@@ -447,4 +512,168 @@
   .cm-footer {
     padding: 0.5rem 1rem;
   }
+}
+
+// ── PDF Viewer — posición fija para escapar de stacking contexts ───────────────
+//
+// Usamos position:fixed en vez de absolute porque:
+// - cm-grid tiene overflow-y:auto → crea stacking context que atrapa absolute
+// - cm-panel tiene overflow:hidden → también recorta absolute si sale del panel
+// - fixed ignora todos esos padres y se ancla al viewport
+//
+.cm-pdf-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 10001; // encima del smoke-canvas del home (z-index: 9999)
+  display: flex;
+  flex-direction: column;
+  background: #09090f;
+  overflow: hidden;
+  animation: cm-slide-up 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // Borde sutil igual que el panel
+  border: 1px solid var(--gold-border);
+
+  // Desktop: centra y limita igual que cm-panel
+  @media (min-width: 581px) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(980px, 96vw);
+    height: min(90vh, 90dvh);
+    inset: unset;
+  }
+}
+
+// ── Topbar del viewer ─────────────────────────────────────────────────────────
+.cm-pdf-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(201, 168, 76, 0.04);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.16);
+  flex-shrink: 0;
+  min-height: 48px;
+
+  &__title {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+
+    @media (max-width: 580px) {
+      font-size: 10px;
+    }
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-3);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+
+    &:hover {
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+    }
+  }
+}
+
+.cm-pdf-back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  padding: 6px 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--gold-dim);
+  }
+}
+
+// ── Estados: cargando / error ─────────────────────────────────────────────────
+.cm-pdf-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  padding: 2rem;
+
+  p {
+    margin: 0;
+  }
+
+  &--error {
+    color: rgba(248, 113, 113, 0.85);
+    svg {
+      opacity: 0.45;
+    }
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.7;
+    code {
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.08);
+      padding: 2px 6px;
+      border: 1px solid rgba(201, 168, 76, 0.15);
+    }
+  }
+}
+
+.cm-pdf-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(201, 168, 76, 0.15);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── iframe ────────────────────────────────────────────────────────────────────
+.cm-pdf-iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+  display: block;
+  min-height: 0; // flex fix para que no ignore flex:1
 }

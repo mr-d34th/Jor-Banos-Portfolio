@@ -5,20 +5,31 @@ import {
   AfterViewInit,
   ElementRef,
   ViewChild,
+  ViewChildren,
+  QueryList,
   inject,
   signal,
+  computed,
   PLATFORM_ID,
+  NgZone,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
-interface MemoryI18n {
-  roleKey: string;
-  originKey: string;
-  yearKey: string;
-  dnaKeys: string[];
-  skills: string[];
+// ─── Canvas particle types ────────────────────────────────────────────────────
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  type: 'node' | 'spark' | 'hex';
+  pulse: number;
+  pulseSpeed: number;
+  colorIdx: number;
 }
 
 @Component({
@@ -30,86 +41,218 @@ interface MemoryI18n {
 })
 export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('bgCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('scrollContainer') scrollRef!: ElementRef<HTMLElement>;
+  @ViewChild('gridEl') gridRef!: ElementRef<HTMLDivElement>;
+  @ViewChildren('nodeEl') nodeEls!: QueryList<ElementRef>;
 
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
+  private zone = inject(NgZone);
+  readonly i18n = inject(TranslationService);
 
+  // ── UI signals ───────────────────────────────────────────────────────────────
   flashActive = signal(false);
   muted = signal(true);
-  activeIndex = signal<number | null>(null);
+  activeNode = signal<number | null>(null);
   hudTime = signal('00:00:00');
+  scrollPct = signal(0);
+  heroRevealed = signal(false);
+  eduRevealed = signal(false);
+  visibleNodes = signal<boolean[]>([]);
 
-  private animId!: number;
+  // ── Eyebrow / title char arrays — reactive to language ───────────────────────
+  eyebrowChars = computed(() => {
+    this.i18n.currentLang(); // reactive dep
+    return this.i18n.t('timeline.hero_eyebrow').split('');
+  });
+  titleChars = computed(() => {
+    this.i18n.currentLang();
+    return this.i18n.t('timeline.hero_title').split('');
+  });
+  subtitleChars = computed(() => {
+    this.i18n.currentLang();
+    return this.i18n.t('timeline.hero_subtitle').split('');
+  });
+
+  // ── Data computed from translations ──────────────────────────────────────────
+  memories = computed(() => {
+    this.i18n.currentLang(); // reactive dep
+    const t = (k: string) => this.i18n.t(k);
+    return [
+      {
+        id: 0,
+        type: t('timeline.mem_0_type'),
+        company: t('timeline.mem_0_company'),
+        role: t('timeline.mem_0_role'),
+        period: t('timeline.mem_0_period'),
+        location: t('timeline.mem_0_location'),
+        contract: t('timeline.mem_0_contract'),
+        context: t('timeline.mem_0_context'),
+        achievements: [
+          { metric: t('timeline.mem_0_ach_0_metric'), text: t('timeline.mem_0_ach_0_text') },
+          { metric: t('timeline.mem_0_ach_1_metric'), text: t('timeline.mem_0_ach_1_text') },
+          { metric: t('timeline.mem_0_ach_2_metric'), text: t('timeline.mem_0_ach_2_text') },
+          { metric: t('timeline.mem_0_ach_3_metric'), text: t('timeline.mem_0_ach_3_text') },
+        ],
+        responsibilities: [
+          t('timeline.mem_0_resp_0'),
+          t('timeline.mem_0_resp_1'),
+          t('timeline.mem_0_resp_2'),
+          t('timeline.mem_0_resp_3'),
+          t('timeline.mem_0_resp_4'),
+          t('timeline.mem_0_resp_5'),
+        ],
+        skills: [
+          'Angular',
+          'Java',
+          'Spring Boot',
+          'GitLab',
+          'Fortinet VPN',
+          'Oracle',
+          'SQL Server',
+          'Figma',
+          'WordPress',
+          'DevOps',
+          'REST APIs',
+        ],
+        primarySkills: ['Angular', 'Java', 'Spring Boot', 'GitLab', 'Oracle'],
+      },
+      {
+        id: 1,
+        type: t('timeline.mem_1_type'),
+        company: t('timeline.mem_1_company'),
+        role: t('timeline.mem_1_role'),
+        period: t('timeline.mem_1_period'),
+        location: t('timeline.mem_1_location'),
+        contract: t('timeline.mem_1_contract'),
+        context: t('timeline.mem_1_context'),
+        achievements: [
+          { metric: t('timeline.mem_1_ach_0_metric'), text: t('timeline.mem_1_ach_0_text') },
+          { metric: t('timeline.mem_1_ach_1_metric'), text: t('timeline.mem_1_ach_1_text') },
+          { metric: t('timeline.mem_1_ach_2_metric'), text: t('timeline.mem_1_ach_2_text') },
+        ],
+        responsibilities: [
+          t('timeline.mem_1_resp_0'),
+          t('timeline.mem_1_resp_1'),
+          t('timeline.mem_1_resp_2'),
+          t('timeline.mem_1_resp_3'),
+          t('timeline.mem_1_resp_4'),
+          t('timeline.mem_1_resp_5'),
+        ],
+        skills: [
+          'React',
+          'React Hook Form',
+          'React Router',
+          'Axios',
+          'JavaScript',
+          'TypeScript',
+          'Git',
+          'Bitbucket',
+          'Jira',
+          'SCRUM',
+        ],
+        primarySkills: ['React', 'React Hook Form', 'TypeScript', 'Bitbucket'],
+      },
+      {
+        id: 2,
+        type: t('timeline.mem_2_type'),
+        company: t('timeline.mem_2_company'),
+        role: t('timeline.mem_2_role'),
+        period: t('timeline.mem_2_period'),
+        location: t('timeline.mem_2_location'),
+        contract: t('timeline.mem_2_contract'),
+        context: t('timeline.mem_2_context'),
+        achievements: [
+          { metric: t('timeline.mem_2_ach_0_metric'), text: t('timeline.mem_2_ach_0_text') },
+          { metric: t('timeline.mem_2_ach_1_metric'), text: t('timeline.mem_2_ach_1_text') },
+        ],
+        responsibilities: [
+          t('timeline.mem_2_resp_0'),
+          t('timeline.mem_2_resp_1'),
+          t('timeline.mem_2_resp_2'),
+          t('timeline.mem_2_resp_3'),
+        ],
+        skills: ['WordPress', 'Magento', 'Elementor', 'HTML', 'CSS', 'JavaScript', 'QA'],
+        primarySkills: ['WordPress', 'Magento', 'Elementor'],
+      },
+    ];
+  });
+
+  education = computed(() => {
+    this.i18n.currentLang();
+    const t = (k: string) => this.i18n.t(k);
+    return [
+      {
+        year: t('timeline.edu_0_year'),
+        institution: t('timeline.edu_0_institution'),
+        degree: t('timeline.edu_0_degree'),
+        certs: [] as string[],
+      },
+      {
+        year: t('timeline.edu_1_year'),
+        institution: t('timeline.edu_1_institution'),
+        degree: t('timeline.edu_1_degree'),
+        certs: [],
+      },
+      {
+        year: t('timeline.edu_2_year'),
+        institution: t('timeline.edu_2_institution'),
+        degree: t('timeline.edu_2_degree'),
+        certs: t('timeline.edu_2_certs')
+          .split(',')
+          .map((s) => s.trim()),
+      },
+      {
+        year: t('timeline.edu_3_year'),
+        institution: t('timeline.edu_3_institution'),
+        degree: t('timeline.edu_3_degree'),
+        certs: [],
+      },
+    ];
+  });
+
+  // ── Canvas state ─────────────────────────────────────────────────────────────
+  private animId = 0;
   private clockId!: ReturnType<typeof setInterval>;
   private W = 0;
   private H = 0;
+  private mouseX = 0;
+  private mouseY = 0;
+  private targetMouseX = 0;
+  private targetMouseY = 0;
   private particles: Particle[] = [];
-  private boxes: FloatingBox[] = [];
+  private time = 0;
 
+  // ── Audio ─────────────────────────────────────────────────────────────────────
   private audioCtx!: AudioContext;
   private gainNode!: GainNode;
   private audioReady = false;
 
-  memories: MemoryI18n[] = [
-    {
-      roleKey: 'timeline.mem_0_role',
-      originKey: 'timeline.mem_0_origin',
-      yearKey: 'timeline.mem_0_year',
-      dnaKeys: [
-        'timeline.mem_0_dna_0',
-        'timeline.mem_0_dna_1',
-        'timeline.mem_0_dna_2',
-        'timeline.mem_0_dna_3',
-      ],
-      skills: ['Angular', 'Java (Spring Boot)', 'GitLab', 'Fortinet VPN', 'Oracle', 'Figma'],
-    },
-    {
-      roleKey: 'timeline.mem_1_role',
-      originKey: 'timeline.mem_1_origin',
-      yearKey: 'timeline.mem_1_year',
-      dnaKeys: [
-        'timeline.mem_1_dna_0',
-        'timeline.mem_1_dna_1',
-        'timeline.mem_1_dna_2',
-        'timeline.mem_1_dna_3',
-      ],
-      skills: ['React', 'React Hook Form', 'React Router', 'Axios', 'Git', 'Bitbucket', 'Jira'],
-    },
-    {
-      roleKey: 'timeline.mem_2_role',
-      originKey: 'timeline.mem_2_origin',
-      yearKey: 'timeline.mem_2_year',
-      dnaKeys: [
-        'timeline.mem_2_dna_0',
-        'timeline.mem_2_dna_1',
-        'timeline.mem_2_dna_2',
-        'timeline.mem_2_dna_3',
-      ],
-      skills: ['WordPress', 'Magento', 'Elementor', 'HTML', 'CSS'],
-    },
-    {
-      roleKey: 'timeline.mem_3_role',
-      originKey: 'timeline.mem_3_origin',
-      yearKey: 'timeline.mem_3_year',
-      dnaKeys: [
-        'timeline.mem_3_dna_0',
-        'timeline.mem_3_dna_1',
-        'timeline.mem_3_dna_2',
-        'timeline.mem_3_dna_3',
-      ],
-      skills: ['HTML', 'CSS', 'JavaScript', 'Angular', 'React', 'APIs REST'],
-    },
+  // ── Cyberpunk color palette ────────────────────────────────────────────────────
+  private readonly COLORS = [
+    { r: 139, g: 92, b: 246 },
+    { r: 6, g: 182, b: 212 },
+    { r: 168, g: 85, b: 247 },
+    { r: 34, g: 211, b: 238 },
+    { r: 99, g: 102, b: 241 },
   ];
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────────
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.visibleNodes.set(new Array(3).fill(false));
     this.startClock();
+    setTimeout(() => this.heroRevealed.set(true), 200);
   }
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    this.initCanvas();
-    window.addEventListener('resize', this.onResize);
+    this.zone.runOutsideAngular(() => {
+      this.initCanvas();
+      window.addEventListener('resize', this.onResize);
+      window.addEventListener('mousemove', this.onMouseMove);
+    });
+    this.setupNodeObservers();
   }
 
   ngOnDestroy(): void {
@@ -117,9 +260,11 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
     cancelAnimationFrame(this.animId);
     clearInterval(this.clockId);
     window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('mousemove', this.onMouseMove);
     this.audioCtx?.close();
   }
 
+  // ── Clock ──────────────────────────────────────────────────────────────────────
   private startClock(): void {
     const tick = () => {
       const n = new Date();
@@ -133,81 +278,50 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.clockId = setInterval(tick, 1000);
   }
 
+  // ── Canvas ────────────────────────────────────────────────────────────────────
   private initCanvas(): void {
-    const canvas = this.canvasRef.nativeElement;
-    this.W = canvas.width = window.innerWidth;
-    this.H = canvas.height = window.innerHeight;
+    const c = this.canvasRef.nativeElement;
+    this.W = c.width = window.innerWidth;
+    this.H = c.height = window.innerHeight;
     this.buildParticles();
-    this.buildBoxes();
-    this.loop(canvas.getContext('2d')!);
+    this.loop(c.getContext('2d')!);
   }
 
   private onResize = (): void => {
-    const canvas = this.canvasRef.nativeElement;
-    this.W = canvas.width = window.innerWidth;
-    this.H = canvas.height = window.innerHeight;
+    const c = this.canvasRef.nativeElement;
+    this.W = c.width = window.innerWidth;
+    this.H = c.height = window.innerHeight;
     this.buildParticles();
-    this.buildBoxes();
   };
 
-  private buildParticles(): void {
-    const count = Math.min(140, Math.floor((this.W * this.H) / 7000));
-    this.particles = Array.from({ length: count }, () => this.makeParticle());
-  }
+  private onMouseMove = (e: MouseEvent): void => {
+    this.targetMouseX = e.clientX;
+    this.targetMouseY = e.clientY;
+    if (this.gridRef?.nativeElement) {
+      const dx = (e.clientX / this.W - 0.5) * 22;
+      const dy = (e.clientY / this.H - 0.5) * 12;
+      this.gridRef.nativeElement.style.transform = `perspective(900px) rotateX(${72 + dy}deg) rotateY(${dx}deg) scale(2.2)`;
+    }
+  };
 
-  // ─── FLOATING BOXES (nuevo: más recuadros con movimiento) ─────────────────
-  private buildBoxes(): void {
-    const count = Math.min(60, Math.floor((this.W * this.H) / 9000));
-    this.boxes = Array.from({ length: count }, () => this.makeBox());
-  }
-
-  private makeBox(): FloatingBox {
-    // 3 size tiers: small / medium / large for visual depth
-    const tier = Math.random();
-    const size =
-      tier < 0.5
-        ? this.rand(10, 35) // small — many, fast
-        : tier < 0.85
-          ? this.rand(35, 80) // medium — standard
-          : this.rand(80, 140); // large — few, slow, dramatic
-    const speedScale = size < 35 ? 1.6 : size < 80 ? 1.0 : 0.4;
-    return {
-      x: this.rand(-size, this.W + size),
-      y: this.rand(-size, this.H + size),
-      w: size,
-      h: size * this.rand(0.4, 1.8),
-      vx: this.rand(-0.5, 0.5) * speedScale,
-      vy: this.rand(-0.4, 0.4) * speedScale,
-      opacity:
-        size < 35
-          ? this.rand(0.06, 0.2) // small: more visible
-          : size < 80
-            ? this.rand(0.04, 0.14)
-            : this.rand(0.02, 0.08), // large: subtle
-      rot: this.rand(0, Math.PI * 2),
-      vrot: this.rand(-0.004, 0.004) * speedScale,
-      pulse: this.rand(0, Math.PI * 2),
-      pulseSpeed: this.rand(0.012, 0.035),
-      filled: Math.random() > 0.55,
-    };
-  }
-
-  private rand(min: number, max: number): number {
+  private rand(min: number, max: number) {
     return Math.random() * (max - min) + min;
   }
 
-  private makeParticle(): Particle {
-    return {
-      x: this.rand(-this.W * 0.5, this.W * 1.5),
-      y: this.rand(-this.H * 0.5, this.H * 1.5),
-      z: this.rand(0.15, 1),
-      vz: this.rand(0.0006, 0.003),
-      type: Math.random() > 0.5 ? 'tri' : 'sq',
-      rot: this.rand(0, Math.PI * 2),
-      vrot: this.rand(-0.006, 0.006),
-      size: this.rand(4, 28),
-      opacity: this.rand(0.05, 0.22),
-    };
+  private buildParticles(): void {
+    const count = Math.min(90, Math.floor((this.W * this.H) / 9000));
+    this.particles = Array.from({ length: count }, (_, i) => ({
+      x: this.rand(0, this.W),
+      y: this.rand(0, this.H),
+      vx: this.rand(-0.25, 0.25),
+      vy: this.rand(-0.18, 0.18),
+      radius: this.rand(1.5, 4.5),
+      opacity: this.rand(0.15, 0.55),
+      type: (i % 5 === 0 ? 'hex' : i % 3 === 0 ? 'spark' : 'node') as Particle['type'],
+      pulse: this.rand(0, Math.PI * 2),
+      pulseSpeed: this.rand(0.012, 0.035),
+      colorIdx: Math.floor(this.rand(0, this.COLORS.length)),
+    }));
   }
 
   private loop(ctx: CanvasRenderingContext2D): void {
@@ -219,145 +333,207 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private drawFrame(ctx: CanvasRenderingContext2D): void {
-    // Motion blur trail: semi-transparent fill instead of full clearRect.
-    // This leaves a fading ghost of previous frames → smoother fluid feel.
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#07070b'; // matches line-time background
+    this.time += 0.016;
+    this.mouseX += (this.targetMouseX - this.mouseX) * 0.06;
+    this.mouseY += (this.targetMouseY - this.mouseY) * 0.06;
+
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = '#050510';
     ctx.fillRect(0, 0, this.W, this.H);
     ctx.globalAlpha = 1;
 
-    // Radial vignette (darker edges)
-    const g = ctx.createRadialGradient(
-      this.W / 2,
-      this.H / 2,
+    // Centre glow follows mouse
+    const gr = ctx.createRadialGradient(
+      this.mouseX || this.W / 2,
+      this.mouseY || this.H / 2,
       0,
-      this.W / 2,
-      this.H / 2,
-      Math.max(this.W, this.H) * 0.65,
+      this.mouseX || this.W / 2,
+      this.mouseY || this.H / 2,
+      Math.max(this.W, this.H) * 0.55,
     );
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(0.7, 'rgba(0,0,0,0.1)');
-    g.addColorStop(1, 'rgba(0,0,0,0.65)');
-    ctx.fillStyle = g;
+    gr.addColorStop(0, 'rgba(139,92,246,0.04)');
+    gr.addColorStop(0.4, 'rgba(6,182,212,0.02)');
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gr;
     ctx.fillRect(0, 0, this.W, this.H);
 
-    // Draw floating boxes (background layer)
-    for (const b of this.boxes) {
-      this.updateBox(b);
-      this.drawBox(ctx, b);
-    }
+    this.drawConnections(ctx);
+    this.updateAndDrawParticles(ctx);
 
-    // Draw depth particles (zoom-in effect)
-    for (const p of this.particles) {
-      p.z -= p.vz;
-      p.rot += p.vrot;
-      if (p.z <= 0.04) {
-        Object.assign(p, this.makeParticle());
-        p.z = this.rand(0.8, 1.0); // respawn far
-      }
-      this.drawParticle(ctx, p);
+    // Mouse glow burst
+    if (this.mouseX || this.mouseY) {
+      const mg = ctx.createRadialGradient(
+        this.mouseX,
+        this.mouseY,
+        0,
+        this.mouseX,
+        this.mouseY,
+        80,
+      );
+      mg.addColorStop(0, `rgba(139,92,246,${0.06 + 0.04 * Math.sin(this.time * 3)})`);
+      mg.addColorStop(0.5, 'rgba(6,182,212,0.03)');
+      mg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = mg;
+      ctx.fillRect(0, 0, this.W, this.H);
     }
   }
 
-  private updateBox(b: FloatingBox): void {
-    b.x += b.vx;
-    b.y += b.vy;
-    b.rot += b.vrot;
-    b.pulse += b.pulseSpeed;
-
-    // Bounce off edges softly
-    if (b.x < -b.w) b.x = this.W + b.w;
-    if (b.x > this.W + b.w) b.x = -b.w;
-    if (b.y < -b.h) b.y = this.H + b.h;
-    if (b.y > this.H + b.h) b.y = -b.h;
-  }
-
-  private drawBox(ctx: CanvasRenderingContext2D, b: FloatingBox): void {
-    // Smooth sin pulse — softer easing
-    const pulse = (Math.sin(b.pulse) + 1) / 2; // 0..1
-    const pulse2 = (Math.sin(b.pulse * 0.7 + 1) + 1) / 2; // offset for variety
-    const alpha = b.opacity * (0.35 + pulse * 0.65);
-
-    ctx.save();
-    ctx.translate(b.x, b.y);
-    ctx.rotate(b.rot);
-    ctx.globalAlpha = alpha;
-
-    const isLarge = b.w >= 80;
-    const isMedium = b.w >= 35 && b.w < 80;
-
-    // Glow on large boxes (shadowBlur is expensive — only for large)
-    if (isLarge) {
-      ctx.shadowColor = 'rgba(201,168,76,0.45)';
-      ctx.shadowBlur = 8 + pulse * 12;
-    }
-
-    ctx.strokeStyle = `rgba(201,168,76,1)`;
-    ctx.lineWidth = isLarge ? 1.0 : isMedium ? 0.7 : 0.5;
-
-    if (b.filled) {
-      ctx.fillStyle = `rgba(201,168,76,${alpha * 0.1})`;
-      ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
-    }
-    ctx.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h);
-
-    // Reset shadow before inner details
-    if (isLarge) ctx.shadowBlur = 0;
-
-    // Inner cross for medium+
-    if (isMedium || isLarge) {
-      ctx.globalAlpha = alpha * (0.15 + pulse2 * 0.2);
-      ctx.lineWidth = 0.4;
-      ctx.beginPath();
-      ctx.moveTo(-b.w / 2, 0);
-      ctx.lineTo(b.w / 2, 0);
-      ctx.moveTo(0, -b.h / 2);
-      ctx.lineTo(0, b.h / 2);
-      ctx.stroke();
-    }
-
-    // Corner dots for large boxes
-    if (isLarge) {
-      ctx.globalAlpha = alpha * 0.6;
-      ctx.fillStyle = 'rgba(201,168,76,1)';
-      const corners: [number, number][] = [
-        [-b.w / 2, -b.h / 2],
-        [b.w / 2, -b.h / 2],
-        [-b.w / 2, b.h / 2],
-        [b.w / 2, b.h / 2],
-      ];
-      for (const [cx, cy] of corners) {
+  private drawConnections(ctx: CanvasRenderingContext2D): void {
+    const maxDist = Math.min(180, this.W * 0.15);
+    for (let i = 0; i < this.particles.length; i++) {
+      for (let j = i + 1; j < this.particles.length; j++) {
+        const pa = this.particles[i];
+        const pb = this.particles[j];
+        const dx = pa.x - pb.x;
+        const dy = pa.y - pb.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist >= maxDist) continue;
+        const proximity = 1 - dist / maxDist;
+        const midX = (pa.x + pb.x) / 2;
+        const midY = (pa.y + pb.y) / 2;
+        const mdx = midX - this.mouseX;
+        const mdy = midY - this.mouseY;
+        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+        const boost = mDist < 200 ? (1 - mDist / 200) * 0.6 : 0;
+        const alpha = (proximity * 0.22 + boost) * (0.5 + 0.5 * Math.sin(this.time * 0.8 + i));
+        if (alpha < 0.01) continue;
+        const ca = this.COLORS[pa.colorIdx];
+        const cb = this.COLORS[pb.colorIdx];
+        const grad = ctx.createLinearGradient(pa.x, pa.y, pb.x, pb.y);
+        grad.addColorStop(0, `rgba(${ca.r},${ca.g},${ca.b},${alpha})`);
+        grad.addColorStop(1, `rgba(${cb.r},${cb.g},${cb.b},${alpha})`);
         ctx.beginPath();
-        ctx.arc(cx, cy, 1.5, 0, Math.PI * 2);
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 0.8 + boost;
+        ctx.stroke();
+      }
+    }
+  }
+
+  private updateAndDrawParticles(ctx: CanvasRenderingContext2D): void {
+    for (const p of this.particles) {
+      // Mouse repulsion
+      const dx = p.x - this.mouseX;
+      const dy = p.y - this.mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120 && dist > 0) {
+        const force = ((120 - dist) / 120) * 0.4;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+      }
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > 1.2) {
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+      }
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+      if (p.x < -10) p.x = this.W + 10;
+      if (p.x > this.W + 10) p.x = -10;
+      if (p.y < -10) p.y = this.H + 10;
+      if (p.y > this.H + 10) p.y = -10;
+
+      // Draw
+      const col = this.COLORS[p.colorIdx];
+      const pulse = (Math.sin(p.pulse) + 1) / 2;
+      const mDist2 = Math.sqrt(dx * dx + dy * dy);
+      const glow = mDist2 < 150 ? 1 - mDist2 / 150 : 0;
+      const alpha = p.opacity * (0.4 + pulse * 0.6) + glow * 0.3;
+      const r = p.radius * (0.8 + pulse * 0.4);
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      if (glow > 0.1) {
+        ctx.shadowColor = `rgba(${col.r},${col.g},${col.b},${glow * 0.8})`;
+        ctx.shadowBlur = 12 + glow * 20;
+      }
+      ctx.globalAlpha = alpha;
+
+      if (p.type === 'hex') {
+        ctx.beginPath();
+        for (let k = 0; k < 6; k++) {
+          const a = (Math.PI / 3) * k - Math.PI / 6 + this.time * 0.3;
+          k === 0
+            ? ctx.moveTo(Math.cos(a) * r * 1.5, Math.sin(a) * r * 1.5)
+            : ctx.lineTo(Math.cos(a) * r * 1.5, Math.sin(a) * r * 1.5);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = `rgba(${col.r},${col.g},${col.b},1)`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      } else if (p.type === 'spark') {
+        ctx.strokeStyle = `rgba(${col.r},${col.g},${col.b},1)`;
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(-r * 2, 0);
+        ctx.lineTo(r * 2, 0);
+        ctx.moveTo(0, -r * 2);
+        ctx.lineTo(0, r * 2);
+        ctx.stroke();
+      } else {
+        const g2 = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 2);
+        g2.addColorStop(0, `rgba(${col.r},${col.g},${col.b},${alpha})`);
+        g2.addColorStop(1, `rgba(${col.r},${col.g},${col.b},0)`);
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = g2;
         ctx.fill();
       }
+      ctx.restore();
     }
-
-    ctx.restore();
   }
 
-  private drawParticle(ctx: CanvasRenderingContext2D, p: Particle): void {
-    const px = this.W / 2 + (p.x - this.W / 2) / p.z;
-    const py = this.H / 2 + (p.y - this.H / 2) / p.z;
-    const s = p.size / p.z;
-    if (s < 1 || s > 200) return;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(p.rot);
-    ctx.globalAlpha = p.opacity * Math.min(1, (1 - p.z) * 3);
-    ctx.strokeStyle = '#c9a84c';
-    ctx.lineWidth = 0.6;
-    if (p.type === 'tri') {
-      ctx.beginPath();
-      ctx.moveTo(0, -s);
-      ctx.lineTo(s * 0.866, s * 0.5);
-      ctx.lineTo(-s * 0.866, s * 0.5);
-      ctx.closePath();
-      ctx.stroke();
+  // ── Scroll ────────────────────────────────────────────────────────────────────
+  onScroll(e: Event): void {
+    const el = e.target as HTMLElement;
+    const max = el.scrollHeight - el.clientHeight;
+    const pct = max > 0 ? Math.round((el.scrollTop / max) * 100) : 0;
+    this.scrollPct.set(pct);
+    if (pct > 80 && !this.eduRevealed()) this.zone.run(() => this.eduRevealed.set(true));
+  }
+
+  private setupNodeObservers(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    setTimeout(() => {
+      const nodes = this.nodeEls.toArray();
+      const visible = [...this.visibleNodes()];
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((entry) => {
+            const idx = nodes.findIndex((n) => n.nativeElement === entry.target);
+            if (idx >= 0 && entry.isIntersecting)
+              this.zone.run(() => {
+                visible[idx] = true;
+                this.visibleNodes.set([...visible]);
+              });
+          }),
+        { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
+      );
+      nodes.forEach((n) => io.observe(n.nativeElement));
+    }, 300);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  getChars(text: string): string[] {
+    return text.split('');
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────────
+  toggleNode(index: number): void {
+    if (this.activeNode() === index) {
+      this.activeNode.set(null);
     } else {
-      ctx.strokeRect(-s / 2, -s / 2, s, s);
+      this.triggerFlash();
+      this.activeNode.set(index);
     }
-    ctx.restore();
+  }
+
+  private triggerFlash(): void {
+    this.flashActive.set(true);
+    setTimeout(() => this.flashActive.set(false), 180);
   }
 
   toggleAudio(): void {
@@ -366,9 +542,11 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.audioReady = true;
     }
     this.muted.update((m) => !m);
-    const target = this.muted() ? 0 : 1;
     this.gainNode.gain.cancelScheduledValues(this.audioCtx.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(target, this.audioCtx.currentTime + 0.5);
+    this.gainNode.gain.linearRampToValueAtTime(
+      this.muted() ? 0 : 0.6,
+      this.audioCtx.currentTime + 0.6,
+    );
   }
 
   private createHum(): void {
@@ -376,17 +554,15 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gainNode = this.audioCtx.createGain();
     this.gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
     this.gainNode.connect(this.audioCtx.destination);
-
     (
       [
-        [55, 0.04],
-        [110, 0.03],
-        [220, 0.015],
-        [440, 0.008],
+        [60, 0.025],
+        [120, 0.015],
+        [240, 0.008],
       ] as [number, number][]
     ).forEach(([freq, amp]) => {
       const osc = this.audioCtx.createOscillator();
-      osc.type = freq < 100 ? 'sawtooth' : 'sine';
+      osc.type = 'sine';
       osc.frequency.value = freq;
       const g = this.audioCtx.createGain();
       g.gain.value = amp;
@@ -394,61 +570,16 @@ export class LineTimeComponent implements OnInit, AfterViewInit, OnDestroy {
       g.connect(this.gainNode);
       osc.start();
     });
-
     const lfo = this.audioCtx.createOscillator();
-    lfo.frequency.value = 0.12;
+    lfo.frequency.value = 0.08;
     const lfoG = this.audioCtx.createGain();
-    lfoG.gain.value = 0.008;
+    lfoG.gain.value = 0.006;
     lfo.connect(lfoG);
     lfoG.connect(this.gainNode.gain);
     lfo.start();
   }
 
-  private triggerFlash(): void {
-    this.flashActive.set(true);
-    setTimeout(() => this.flashActive.set(false), 200);
-  }
-
-  toggleMemory(index: number): void {
-    if (this.activeIndex() === index) {
-      this.activeIndex.set(null);
-    } else {
-      this.triggerFlash();
-      this.activeIndex.set(index);
-    }
-  }
-
-  closeActive(): void {
-    this.activeIndex.set(null);
-  }
   goBack(): void {
     this.router.navigate(['/']);
   }
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  z: number;
-  vz: number;
-  type: 'tri' | 'sq';
-  rot: number;
-  vrot: number;
-  size: number;
-  opacity: number;
-}
-
-interface FloatingBox {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  vx: number;
-  vy: number;
-  opacity: number;
-  rot: number;
-  vrot: number;
-  pulse: number;
-  pulseSpeed: number;
-  filled: boolean;
 }
