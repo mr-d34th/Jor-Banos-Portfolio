@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:portfolio": "node dist/portfolio/server/server.mjs"
+    "serve:ssr:portfolio": "node dist/portfolio/server/server.mjs",
+    "deploy": "ng deploy --repo=https://github.com/mr-d34th/Jor-Banos-Portfolio.git --name=\"mr-d34th\" --base-href=/Jor-Banos-Portfolio/"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

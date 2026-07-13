@@ -99,7 +99,7 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
       institution: 'Udemy',
       category: 'backend',
       date: '2025-01',
-      url: 'assets/certificates/python-ciencia-de-datos-ceps-uni.pdf',
+      url: 'assets/certificates/python-backend-udemy.pdf',
       badge: '◉',
     },
     {
@@ -108,7 +108,7 @@ export class CertificatesModalComponent implements OnInit, AfterViewInit, OnDest
       institution: 'CEPS UNI – Universidad Nacional de Ingeniería',
       category: 'backend',
       date: '2021-03',
-      url: 'assets/certificates/python-backend-udemy.pdf',
+      url: 'assets/certificates/python-ciencia-de-datos-ceps-uni.pdf',
       badge: '◉',
       hours: '24h',
     },
